@@ -1992,7 +1992,47 @@ section,
     max-width: 80%;
   }
 }
+.profile-picture.rotating-frame {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+}
+.profile-picture.rotating-frame::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent 0deg 45deg, #1b8c0c 45deg 135deg, transparent 135deg 225deg, #1b8c0c 225deg 315deg, transparent 315deg 360deg);
+  animation: pfpRotate 10s linear infinite;
+}
+.profile-picture.rotating-frame .pfp {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  border-radius: 50%;
+  object-fit: cover;
+}
+@keyframes pfpRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
+.pfp {
+  border-radius: 50%;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.text-center {
+  text-align: center;
+}
 /*--------------------------------------------------------------
 # Starter Section Section
 --------------------------------------------------------------*/
