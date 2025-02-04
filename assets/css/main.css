@@ -2042,6 +2042,7 @@ section,
 
 
 /* Style the checkbox container */
+/* Style the checkbox container */
 .form-check {
   display: flex;
   align-items: center;
@@ -2055,7 +2056,7 @@ section,
   width: 20px;
   height: 20px;
   appearance: none; /* Hides the default style */
-  border: 2px solid #1b8c0c;
+  border: 2px solid #007bff;
   border-radius: 5px;
   display: inline-block;
   position: relative;
@@ -2065,8 +2066,8 @@ section,
 
 /* When checkbox is checked */
 .form-check-input:checked {
-  background-color: #1b8c0c;
-  border-color: #1b8c0c;
+  background-color: #007bff;
+  border-color: #007bff;
 }
 
 /* Adding a tick mark */
@@ -2077,7 +2078,7 @@ section,
   top: 2px;
   width: 6px;
   height: 10px;
-  border: solid #1b8c0c;
+  border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -2100,4 +2101,20 @@ section,
   text-align: center;
   margin-left: auto;
   margin-right: auto;
+  z-index: 2;
+}
+
+.logo-underlay{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.1; /* Transparent Effect */
+  width: 200px;
+  height: 200px;
+  z-index: -1; /* Push it behind */
+}
+.logo-overlay img {
+  width: 100%;
+  height: auto;
 }
