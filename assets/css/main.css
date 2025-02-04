@@ -2056,7 +2056,7 @@ section,
   width: 20px;
   height: 20px;
   appearance: none; /* Hides the default style */
-  border: 2px solid #007bff;
+  border: 2px solid #1b8c0c;
   border-radius: 5px;
   display: inline-block;
   position: relative;
@@ -2066,8 +2066,8 @@ section,
 
 /* When checkbox is checked */
 .form-check-input:checked {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: #1b8c0c;
+  border-color: #1b8c0c;
 }
 
 /* Adding a tick mark */
@@ -2078,7 +2078,7 @@ section,
   top: 2px;
   width: 6px;
   height: 10px;
-  border: solid white;
+  border: solid #1b8c0c;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -2088,20 +2088,27 @@ section,
   color: #333;
   font-weight: 500;
 }
+.checkbx{
+  font-size: small;
+  padding-left: 10px;
+}
+
 
 .loginForm {
   background: rgba(255, 255, 255, 0.15); /* Semi-transparent */
   border-radius: 15px;
   padding: 30px;
-  width: 350px;
+  width: max-content;
   backdrop-filter: blur(10px); /* Glass effect */
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  text-align: center;
+  text-align: left;
   margin-left: auto;
   margin-right: auto;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
 }
 
 .logo-underlay{
@@ -2110,11 +2117,51 @@ section,
   left: 50%;
   transform: translate(-50%, -50%);
   opacity: 0.1; /* Transparent Effect */
-  width: 200px;
-  height: 200px;
-  z-index: -1; /* Push it behind */
+  width: 100%;
+  height: 100%;
+  object-fit:contain;
+  z-index: -1; /* Push it behind */  
 }
 .logo-overlay img {
   width: 100%;
   height: auto;
+}
+
+.spaced-div{
+  margin: 1px;
+  padding: 10px;
+}
+
+.spaced-div button{
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* General Input Styling */
+.loginForm .form-control {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* Border Effect on Hover */
+.loginForm .form-control:hover {
+  border-color: #1b8c0c;
+}
+
+/* Focus Effect with Glowing Border */
+.loginForm .form-control:focus {
+  border-color: #1b8c0c;
+  box-shadow: 0 0 20px rgba(27, 140, 12, 0.5);
+}
+
+/* Placeholder Styling */
+.loginForm .form-control::placeholder {
+  color: #999;
+  font-style: italic;
 }
