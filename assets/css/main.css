@@ -2055,7 +2055,7 @@ section,
   width: 20px;
   height: 20px;
   appearance: none; /* Hides the default style */
-  border: 2px solid #007bff;
+  border: 2px solid #1b8c0c;
   border-radius: 5px;
   display: inline-block;
   position: relative;
@@ -2065,8 +2065,8 @@ section,
 
 /* When checkbox is checked */
 .form-check-input:checked {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: #1b8c0c;
+  border-color: #1b8c0c;
 }
 
 /* Adding a tick mark */
@@ -2077,7 +2077,7 @@ section,
   top: 2px;
   width: 6px;
   height: 10px;
-  border: solid white;
+  border: solid #1b8c0c;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -2088,3 +2088,16 @@ section,
   font-weight: 500;
 }
 
+.loginForm {
+  background: rgba(255, 255, 255, 0.15); /* Semi-transparent */
+  border-radius: 15px;
+  padding: 30px;
+  width: 350px;
+  backdrop-filter: blur(10px); /* Glass effect */
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
