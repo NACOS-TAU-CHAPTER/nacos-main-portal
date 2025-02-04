@@ -2039,3 +2039,52 @@ section,
 .starter-section {
   /* Add your styles here */
 }
+
+
+/* Style the checkbox container */
+.form-check {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  cursor: pointer;
+  gap: 8px; /* Adds spacing between checkbox and label */
+}
+
+/* Hide the default checkbox */
+.form-check-input {
+  width: 20px;
+  height: 20px;
+  appearance: none; /* Hides the default style */
+  border: 2px solid #007bff;
+  border-radius: 5px;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* When checkbox is checked */
+.form-check-input:checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+/* Adding a tick mark */
+.form-check-input:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Style the label */
+.form-check-label {
+  color: #333;
+  font-weight: 500;
+}
+
