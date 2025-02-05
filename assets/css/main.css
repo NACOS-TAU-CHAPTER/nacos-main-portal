@@ -2054,8 +2054,8 @@ section,
 
 /* Hide the default checkbox */
 .form-check-input {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   appearance: none; /* Hides the default style */
   border: 2px solid #1b8c0c;
   border-radius: 5px;
@@ -2091,7 +2091,7 @@ section,
 }
 .checkbx{
   font-size: small;
-  padding-left: 10px;
+  margin: 8px 0;
 }
 
 
