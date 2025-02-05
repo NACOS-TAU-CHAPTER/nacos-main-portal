@@ -2099,7 +2099,9 @@ section,
   background: rgba(255, 255, 255, 0.15); /* Semi-transparent */
   border-radius: 15px;
   padding: 30px;
+  margin: 0;
   width: max-content;
+  height: fit-content;
   backdrop-filter: blur(10px); /* Glass effect */
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
@@ -2137,7 +2139,7 @@ section,
 
 .spaced-div{
   margin: 1px;
-  padding: 8px;
+  padding: 2px;
 }
 
 /* .spaced-div button{
