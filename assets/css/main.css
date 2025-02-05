@@ -2066,23 +2066,27 @@ section,
 }
 
 /* When checkbox is checked */
+/* Style the checkbox when checked */
 .form-check-input:checked {
   background-color: #1b8c0c;
   border-color: #1b8c0c;
 }
 
-/* Adding a tick mark */
-.form-check-input:checked::after {
-  content: "";
+/* Custom tick mark for checked state */
+.form-check-input:checked::before {
+  content: ""; /* Unicode checkmark */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
   position: absolute;
-  left: 6px;
-  top: 2px;
-  width: 6px;
-  height: 10px;
-  border: solid #1b8c0c;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
+
 
 /* Style the label */
 .form-check-label {
@@ -2167,13 +2171,14 @@ section,
 /* Focus Effect with Glowing Border */
 .loginForm .form-control:focus {
   border-color: #1b8c0c;
-  box-shadow: 0 0 20px rgba(27, 140, 12, 0.5);
+  box-shadow: 0 0 25px rgba(27, 140, 12, 0.5);
 }
 
 /* Placeholder Styling */
 .loginForm .form-control::placeholder {
   color: #999;
   font-style: italic;
+  font-size: medium;
 }
 
 .submit{
