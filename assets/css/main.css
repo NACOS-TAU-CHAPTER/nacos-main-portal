@@ -2121,7 +2121,9 @@ section,
 }
 
 .loginForm:hover{
-  box-shadow: 0 4px 30px rgba(0,0,0,1.5);
+  /* box-shadow: 0 4px 30px rgba(0,0,0,1.5); */
+  box-shadow: 0 4px 30px #1b8c0c;
+
   transition: all 0.5s ease-in-out;
 }
 
