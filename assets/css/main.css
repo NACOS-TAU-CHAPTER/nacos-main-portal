@@ -2091,7 +2091,7 @@ section,
 }
 .checkbx{
   font-size: small;
-  margin: 8px 0;
+  margin-left: 100px;
 }
 
 
@@ -2111,6 +2111,12 @@ section,
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+}
+
+.loginForm:hover{
+  box-shadow: 0 4px 30px rgba(0,0,0,1.5);
+  transition: all 0.5s ease-in-out;
 }
 
 .logo-underlay{
