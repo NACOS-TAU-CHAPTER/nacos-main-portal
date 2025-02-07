@@ -64,17 +64,17 @@
             <form>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Email address:</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" required>
                     <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                 </div>
                 <div class="form-group spaced-div">
                     <label for="exampleInputPassword1">Password:</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" required>
                 </div>
                 <!-- Align Checkbox with Input Fields -->
-                <div class="form-check spaced-div checkbx form-group" style="margin-left: 20px;">
-                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                    <label class="form-check-label" for="exampleCheck1">Remember Me</label>
+                <div class="form-check spaced-div checkbx form-group" style="margin-left: 21px;">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1" for="exampleCheck1" >
+                    <label class="form-check-label" for="exampleCheck1"  id="exampleCheck1">Remember Me</label>
                 </div>
                 <!-- Center Submit Button -->
                 <div style="display: flex; justify-content: center; margin-top: 20px;">
@@ -180,6 +180,7 @@
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
 
   <!-- Main JS File -->
   <script src="dashboard asseets/js/main.js"></script>
