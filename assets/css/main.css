@@ -853,6 +853,7 @@ section,
 .section-title h2:after {
   content: "";
   position: absolute;
+  border-radius: 20px;
   display: block;
   width: 50px;
   height: 3px;
@@ -2038,4 +2039,169 @@ section,
 --------------------------------------------------------------*/
 .starter-section {
   /* Add your styles here */
+}
+
+
+/* Style the checkbox container */
+/* Style the checkbox container */
+.form-check {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  cursor: pointer;
+  gap: 8px; /* Adds spacing between checkbox and label */
+}
+
+/* Hide the default checkbox */
+.form-check-input {
+  width: 20px;
+  height: 20px;
+  appearance: none; /* Hides the default style */
+  border: 2px solid #1b8c0c;
+  border-radius: 5px;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* When checkbox is checked */
+/* Style the checkbox when checked */
+.form-check-input:checked {
+  background-color: #1b8c0c;
+  border-color: #1b8c0c;
+}
+
+/* Custom tick mark for checked state */
+.form-check-input:checked::before {
+  content: ""; /* Unicode checkmark */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+
+/* Style the label */
+.form-check-label {
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+}
+.checkbx{
+  font-size: small;
+  margin-left: 100px;
+}
+
+
+.loginForm {
+  background: rgba(255, 255, 255, 0.15); /* Semi-transparent */
+  border-radius: 15px;
+  padding: 30px;
+  margin: 0;
+  width: max-content;
+  height: fit-content;
+  backdrop-filter: blur(10px); /* Glass effect */
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.loginForm:hover{
+  /* box-shadow: 0 4px 30px rgba(0,0,0,1.5); */
+  box-shadow: 0 4px 50px #1b8c0c; 
+
+  transition: all 0.5s ease-in-out;
+}
+
+.logo-underlay{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.1; /* Transparent Effect */
+  width: 100%;
+  height: 100%;
+  object-fit:contain;
+  z-index: -1; /* Push it behind */  
+}
+.logo-overlay img {
+  width: 100%;
+  height: auto;
+}
+
+.spaced-div{
+  margin: 1px;
+  padding: 2px;
+}
+
+/* .spaced-div button{
+  margin-left: auto;
+  margin-right: auto;
+} */
+
+/* General Input Styling */
+.loginForm .form-control {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* Border Effect on Hover */
+.loginForm .form-control:hover {
+  border-color: #1b8c0c;
+}
+
+/* Focus Effect with Glowing Border */
+.loginForm .form-control:focus {
+  border-color: #1b8c0c;
+  box-shadow: 0 0 25px rgba(27, 140, 12, 0.5);
+}
+
+/* Placeholder Styling */
+.loginForm .form-control::placeholder {
+  color: #999;
+  font-style: italic;
+  font-size: medium;
+}
+
+.loginForm .form-control.error {
+  border: 100px solid red;
+  animation: vibrate 0.5s ease infinite;
+}
+.loginForm .form-control.error::placeholder {
+ background-color: #060606;
+}
+
+@keyframes vibrate {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0px); }
+}
+
+.submit{
+  margin-right: auto;
+  margin-left: auto;
 }
