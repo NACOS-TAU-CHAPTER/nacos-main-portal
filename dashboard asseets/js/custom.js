@@ -93,7 +93,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const userEmail = user.user?.email; // Get logged-in user email
-
+    const {data:rsvpData, error: rsvpError} = await supabase
+        .from("Events")
+        .select("*")
+        .eq("id", user.user?.id)
+        .single();
+    if(rsvpData){
+        document.getElementById("rsvp-download").style.display = "flex";
+        document.getElementById("rsvp-modal-open").removeAttribute('data-bs-toggle');
+        document.getElementById("rsvp-modal-open").removeAttribute('data-bs-target');
+        document.getElementById("rsvp-modal-open").addEventListener("click", (event)=>{
+            event.preventDefault();
+            Swal.fire({
+                title: "RSVP Details",
+                text: "You have already RSVP'd for the event. Download your ticket from the dashboard.",
+                icon: "info",
+                confirmButtonText: "Okay",
+            })
+            return;
+        })
+        document.getElementById("rsvp-download").addEventListener("click", (event)=>{
+            event.preventDefault();
+            window.location.href = "events.html";
+        })
+    }
     const { data, error: fetchError } = await supabase
         .from("Students")
         .select("*") // Select all columns, or specify them like: .select("name, matric_no, course")
@@ -133,7 +156,24 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             return;
         }
-        const userId = user.id;
+        const userId = user.user?.id;
+        const {data, fetchError} = await supabase
+            .from("Students")
+            .select("*")
+            .eq("id", userId)
+            .single();
+        if(fetchError){
+            Swal.fire({
+                title: "Error!",
+                text: "An error occurred while fetching student data.",
+                icon: "error",
+                confirmButtonText: "Okay",
+            });
+            return;
+        }
+        const matricNo = data.matric_no;
+        const rsvp = "RSVP";
+        console.log(userId);
         const { data: existingStudent, error: checkError } = await supabase
               .from("Events")
               .select("*")
@@ -163,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .insert([{
                 matric_no: matricNo,
                 id: userId, 
-                unwind_and_connect: "RSVP",
+                unwind_and_connect: rsvp,
             }]);
             if(insertError){
                 Swal.fire({
@@ -180,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: "success",
                 confirmButtonText: "Click here to download your ticket",
             }).then(()=>{
-                //
+                window.location.href = "events.html";
             })
           }
         

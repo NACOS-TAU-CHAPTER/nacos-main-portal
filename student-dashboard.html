@@ -154,10 +154,15 @@
                 <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100" style="width: 100%;">
                   <div class="service-item item-cyan position-relative">
                     <img src="assets/img/hangout.png" class="img-fluid icon" alt="" style="border: none;">
-                    <div>
-                      <h3>Unwind and Connect</h3>
-                      <p><em>15/02/2025</em></p>
-                      <button class="read-more stretched-link" style="background-color: white;border: none;color: #1b8c0c;" data-bs-toggle="modal" data-bs-target="#eventRsvp">RSVP <i class="bi bi-arrow-right"></i></button>
+                    <div style="display: flex;width: 100%;justify-content: space-between;">
+                      <div>
+                        <h3>Unwind and Connect</h3>
+                        <p><em>15/02/2025</em></p>
+                        <button id="rsvp-modal-open" class="read-more" style="background-color: white;border: none;color: #1b8c0c;width: fit-content;" data-bs-toggle="modal" data-bs-target="#eventRsvp">RSVP <i class="bi bi-arrow-right"></i></button>
+                      </div>
+                      <div style="display: none;align-items: center;" id="rsvp-download">
+                        <button style="background-color: white;border: none;width: fit-content;align-self: center;"><i class="bi bi-download" style="color: #1b8c0c;"></i></button>
+                      </div>
                     </div>
                   </div>
                 </div>
