@@ -7,6 +7,9 @@
   <title>Student Dashboard</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  <meta http-equiv="pragma" content="no-cache">
 
   <!-- Favicons -->
   <link href="assets/img/tau_logo-removebg-preview.png" rel="icon">
@@ -26,6 +29,9 @@
 
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body class="service-details-page">
@@ -94,16 +100,44 @@
 
           <div class="col-lg-8 ps-lg-5" data-aos="fade-up" data-aos-delay="200" id="profile" style="display: flex;flex-direction: column;justify-content: center;">
             <div class="profile-picture rotating-frame" style="align-self: center;padding-bottom: 20px;">
-              <img src="assets/img/IMG_2189.jpg" class="pfp">
+              <img src="assets/img/dummy img.jpg" class="pfp" id="display_picture">
             </div>
             <!-- <img src="assets/img/services.jpg" alt="" class="img-fluid"> -->
-            <h3 style="text-align: center;">[Name]</h3>
-            <p class="text-center">
-              [Matric No]
-            </p>
-            <p class="text-center"> 
-              [Course]
-            </p>
+            <div style="display: flex;flex-direction: column;justify-content: center;">
+              <h3 style="text-align: center;" id="student-name">Loading...</h3>
+              <p class="text-center" id="matric_no">
+                Loading...
+              </p>
+              <p class="text-center" id="course">
+                Loading...
+              </p>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updatePfp" style="width: max-content;align-self: center;color:#1b8c0c;background-color: white;border-color: #1b8c0c;">
+                Update Profile Picture
+              </button>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="updatePfp" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> 
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel" style="color: #1b8c0c;">Update Profile Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body" style="display: flex;justify-content: center;">
+                    <form id="upload-form">
+                      <div class="form-group" style="width: max-content;justify-content: center;display: flex;flex-direction: column;">
+                        <input class="form-control" type="file" id="profile-pic" accept="image/*" required>
+                        <button type="submit" style="background-color: white;border: none;width: max-content;align-self: center;margin-top: 3%;"><i class="bi bi-cloud-upload" style="color: #1b8c0c;"></i></button>
+                      </div>
+                  </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-primary" style="width: max-content;align-self: center;color:#1b8c0c;background-color: white;border-color: #1b8c0c;">Done</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <section id="events" class="services section light-background">
 
@@ -123,7 +157,30 @@
                     <div>
                       <h3>Unwind and Connect</h3>
                       <p><em>15/02/2025</em></p>
-                      <a href="#" class="read-more stretched-link">RSVP <i class="bi bi-arrow-right"></i></a>
+                      <button class="read-more stretched-link" style="background-color: white;border: none;color: #1b8c0c;" data-bs-toggle="modal" data-bs-target="#eventRsvp">RSVP <i class="bi bi-arrow-right"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade" id="eventRsvp" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> 
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" style="color: #1b8c0c;">Reserve your spot!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body" style="display: flex;justify-content: center;">
+                        <!-- <form id="rsvp-form">
+                          <div class="form-group" style="width: max-content;justify-content: center;display: flex;flex-direction: column;">
+                            <label for="matric_no"> Enter your matric number:</label>
+                            <input class="form-control" type="text" id="matric_no" required>
+                            <button type="submit" style="background-color: white;border-color: #1b8c0c;width: max-content;align-self: center;margin-top: 3%;color: #1b8c0c;border-radius: 10px;">RSVP</button>
+                          </div>
+                      </form> -->
+                      <button id="rsvp-btn" type="button" style="background-color: white;border-color: #1b8c0c;width: max-content;align-self: center;margin-top: 3%;color: #1b8c0c;border-radius: 10px;">RSVP for Unwind and Connect.</button>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" data-bs-dismiss="modal" class="btn btn-primary" style="width: max-content;align-self: center;color:#1b8c0c;background-color: white;border-color: #1b8c0c;">Done</button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -234,8 +291,8 @@
             <p><strong>Email:</strong> <span>nacos@tau.edu.ng</span></p>
           </div>
           <div class="social-links d-flex mt-4" style="justify-content: center;">
-            <a href=""><i class="bi bi-twitter-x"></i></a>
-            <a href=""><i class="bi bi-instagram"></i></a>
+            <a href="https://www.tiktok.com/@nacos_tau?is_from_webapp=1&sender_device=pc"><i class="bi bi-tiktok"></i></a>
+            <a href="https://www.instagram.com/nacos_tauchapter?igsh=MWw1ZTlpaWZxZnl6cA=="><i class="bi bi-instagram"></i></a>
             <a href=""><i class="bi bi-linkedin"></i></a>
           </div>
         </div>
@@ -277,7 +334,7 @@
     </div>
 
     <div class="container copyright text-center mt-4">
-      <p> <span>Copyright</span> © <strong class="px-1 sitename">Nigerian Association of Computing Students - Thomas Adewumi University.</strong><br><span>All Rights Reserved.</span></p>
+      <p> <span>Copyright</span> © <strong class="px-1 sitename">NACOS - TAU Development Team.</strong><br><span>All Rights Reserved.</span></p>
       <div class="credits">
         <!-- All the links in the footer should remain intact. -->
         <!-- You can delete the links only if you've purchased the pro version. -->
@@ -303,7 +360,8 @@
 
   <!-- Main JS File -->
   <script src="dashboard asseets/js/main.js"></script>
-  <script src="dashboard asseets/js/custom.js"></script>
+  <script src="dashboard asseets/js/custom.js" type="module"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2" ></script>
 
 </body>
 

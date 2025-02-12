@@ -838,7 +838,7 @@ section,
 --------------------------------------------------------------*/
 .section-title {
   text-align: center;
-  padding-bottom: 60px;
+  padding-bottom: 5%;
   position: relative;
 }
 
@@ -2106,7 +2106,7 @@ section,
   border-radius: 15px;
   padding: 30px;
   margin: 0;
-  width: max-content;
+  width: fit-content;
   height: fit-content;
   backdrop-filter: blur(10px); /* Glass effect */
   -webkit-backdrop-filter: blur(10px);

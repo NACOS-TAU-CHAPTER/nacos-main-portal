@@ -26,6 +26,23 @@
 
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .toggle-password{
+        position: absolute;
+        right: 10px;
+        top: 70%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .password-container{
+        position: relative;
+    }
+  </style>
 </head>
 
 <body class="starter-page-page">
@@ -58,18 +75,29 @@
         <div class="container section-title" data-aos="fade-up">
             <h2>Sign in</h2>
             <p>Enter details to gain access to your dashboard</p>
+            <a href="student-signup.html">Not registered? <span>Click here to signup.</span></a>
         </div><!-- End Section Title -->
     
         <div class="container" data-aos="fade-up" style="margin: 0px; padding: 0px;">
             <form>
+                <!-- <div class="form-group">
+                  <label for="matric_no">Matric Number:</label>
+                  <input type="text" class="form-control" id="matric_no" aria-describedby="text" placeholder="Enter matric number" required>
+                </div> -->
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Email address:</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" required>
+                    <label for="email">Student Email:</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter student email" required>
                     <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                 </div>
-                <div class="form-group spaced-div">
-                    <label for="exampleInputPassword1">Password:</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" required>
+                <div class="password-container">
+                  <label for="email">Password:</label>
+                  <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                  <button 
+                  id="toggle-password" 
+                  class="toggle-password"
+                  type="button"
+                  >
+                  <i class="bi bi-eye-slash"></i></button>
                 </div>
                 <!-- Align Checkbox with Input Fields -->
                 <div class="form-check spaced-div checkbx form-group" style="margin-left: 21px;">
@@ -114,8 +142,8 @@
             <p><strong>Email:</strong> <span>nacos@tau.edu.ng</span></p>
           </div>
           <div class="social-links d-flex mt-4" style="justify-content: center;">
-            <a href=""><i class="bi bi-twitter-x"></i></a>
-            <a href=""><i class="bi bi-instagram"></i></a>
+            <a href="https://www.tiktok.com/@nacos_tau?is_from_webapp=1&sender_device=pc"><i class="bi bi-tiktok"></i></a>
+            <a href="https://www.instagram.com/nacos_tauchapter?igsh=MWw1ZTlpaWZxZnl6cA=="><i class="bi bi-instagram"></i></a>
             <a href=""><i class="bi bi-linkedin"></i></a>
           </div>
         </div>
@@ -157,7 +185,7 @@
     </div>
 
     <div class="container copyright text-center mt-4">
-      <p> <span>Copyright</span> © <strong class="px-1 sitename">Nigerian Association of Computing Students - Thomas Adewumi University.</strong><br><span>All Rights Reserved.</span></p>
+      <p> <span>Copyright</span> © <strong class="px-1 sitename">NACOS - TAU Development Team.</strong><br><span>All Rights Reserved.</span></p>
       <div class="credits">
         <!-- All the links in the footer should remain intact. -->
         <!-- You can delete the links only if you've purchased the pro version. -->
@@ -184,6 +212,9 @@
 
   <!-- Main JS File -->
   <script src="dashboard asseets/js/main.js"></script>
+  <script src="dashboard asseets/js/signin.js" type="module"></script>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 </body>
 

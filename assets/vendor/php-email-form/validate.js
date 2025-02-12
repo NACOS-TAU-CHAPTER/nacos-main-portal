@@ -83,3 +83,14 @@
   }
 
 })();
+// async function getApiKey() {
+//   try {
+//       const response = await fetch("http://localhost:3000/api-key");
+//       const data = await response.json();
+//       console.log("Secure API Key:", data.apiKey);
+//   } catch (error) {
+//       console.error("Error fetching API key:", error);
+//   }
+// }
+
+// getApiKey();

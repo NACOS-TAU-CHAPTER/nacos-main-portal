@@ -12,6 +12,21 @@
   /**
    * Apply .scrolled class to the body as the page is scrolled down
    */
+  document.addEventListener("DOMContentLoaded", async () => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove the `#`
+    const accessToken = hashParams.get("access_token");
+    const refreshToken = hashParams.get("refresh_token");
+  
+    if (accessToken) {
+      // Store tokens securely (e.g., localStorage, sessionStorage, or state management)
+      sessionStorage.setItem("supabaseAccessToken", accessToken);
+      sessionStorage.setItem("supabaseRefreshToken", refreshToken);
+  
+      // Redirect user to the dashboard
+      window.location.href = "index.html";
+    }
+  });
+  
   function toggleScrolled() {
     const selectBody = document.querySelector('body');
     const selectHeader = document.querySelector('#header');
