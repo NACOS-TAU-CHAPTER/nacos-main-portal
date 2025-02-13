@@ -55,8 +55,53 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       return;
     }
-    
+    if(pass_value.length < 6){
+      Swal.fire({
+        title: "Error!",
+        text: "Your password must be a minimum of 6 characters",
+        icon: "error",
+        confirmButtonText: "Okay",
+      });
+      return;
+    }
     const signUpStudent = async (email, password, full_name, matric_no, course) => {
+      // Check for email and matric number duplicates
+      const { data:existingUser, error:existingUserError } = await supabase
+      .from("Students")
+      .select("email, matric_no")
+      .or(`email.eq.${email},matric_no.eq.${matric_no}`);
+
+      if (existingUserError) {
+      Swal.fire({
+        title: "Error!",
+        text: "We're unable to access the server at this time. Please try again later.",
+        icon: "error",
+        confirmButtonText: "Okay",
+      });
+      return;
+      }
+
+      // Check if email or matric number already exists
+      if (existingUser && existingUser.length > 0) {
+      const existing = existingUser[0];
+
+      if (existing.email === email) {
+        Swal.fire({
+          title: "Error!",
+          text: "A user with this email already exists.",
+          icon: "error",
+          confirmButtonText: "Okay",
+        });
+      } else if (existing.matric_no === matric_no) {
+        Swal.fire({
+          title: "Error!",
+          text: "A user with this matric number already exists.",
+          icon: "error",
+          confirmButtonText: "Okay",
+        });
+      }
+      return;
+      }
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -72,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
           title: "Error!",
           text: "Signup Failed! Please try again.",
           icon: "error",
-          button: "Okay",
+          confirmButtonText: "Okay",
         });
         return;
       } else{

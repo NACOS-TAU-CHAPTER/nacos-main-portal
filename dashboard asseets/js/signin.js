@@ -67,7 +67,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
               .single();
   
           if (checkError && checkError.code !== "PGRST116") { // Ignore "no rows found" error
-              console.error("Error checking student:", checkError);
+            //   console.error("Error checking student:", checkError);
               Swal.fire({
                   title: "Error!",
                   text: "An error occurred while checking user data.",
