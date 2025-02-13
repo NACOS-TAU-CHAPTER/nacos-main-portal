@@ -186,6 +186,9 @@ h6 {
   #br{
     display: none;
   }
+  .main{
+    margin-top: 10%;
+  }
 }
 @media (min-width: 481px){
   .header .logo h1{

@@ -32,6 +32,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @media (max-width:480px) {
+      .main{
+        margin-top: 15%;
+      }
+    }
+    @media (min-width: 481px){
+      .main{
+        margin-top: 10%;
+      }
+    }
+  </style>
 </head>
 
 <body class="service-details-page">
@@ -43,12 +55,12 @@
         <img src="assets/img/nacos logo.jpg" alt="">
         <h1 class="sitename"><span style="color: #1b8c0c;" id="nacos-text">Nigerian Association of Computing Students</span><br id="br"> <strong id="tau-text">Thomas Adewumi University</strong></h1>
       </a>
-      <a id="home-btn" class="btn-getstarted" href="student-dashboard.html" style="text-align: center;display: none;">Home</a>
+      <button id="home-btn" class="btn-getstarted" style="text-align: center;background-color: white;color: #1b8c0c;border-color: #1b8c0c;"><i class="bi bi-house-fill"></i></button>
 
     </div>
   </header>
 
-  <main class="main" style="margin-top: 10%;">
+  <main class="main">
 
     <!-- Page Title -->
     <!-- <div class="page-title" data-aos="fade">

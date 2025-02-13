@@ -38,4 +38,7 @@ document.addEventListener("DOMContentLoaded", ()=> {
         ticketFrame.src = ticket.ticket;
     }
     fetchUser();
+    homeBtn.addEventListener("click", ()=>{
+        window.location.href = "student-dashboard.html"
+    })
 })
