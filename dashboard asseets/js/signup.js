@@ -37,7 +37,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const pass_value = password.value.trim();
     const confirm_pass_value = confirm_password.value.trim(); 
-    
+    if (studentEmail.slice(-10) != "tau.edu.ng"){
+      Swal.fire({
+        title: "Error!",
+        text: "You must signup with your school email!",
+        icon: "error",
+        confirmButtonText: "Okay",
+      });
+      return;
+    }
     if(pass_value !== confirm_pass_value){
       Swal.fire({
         title: "Error!",
