@@ -5,7 +5,15 @@
 * Author: BootstrapMade.com
 * License: https://bootstrapmade.com/license/
 */
-
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const supabaseUrl = "https://dgsipldaivnwxoyodzcw.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnc2lwbGRhaXZud3hveW9kemN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5MzExODEsImV4cCI6MjA1NDUwNzE4MX0.1YLPU_OhyG2CFwf8C4odEstPhL9Ico9lNYK8Lwg-AD0";
+const homeBtn = document.getElementById("home-btn");
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const rsvpLink = document.getElementById("rsvp-link");
+const signinBtn = document.getElementById("signin-btn");
+const signinBtn2 = document.getElementById("signin-btn2");
+const homeBtn2 = document.getElementById("home-btn2");
 (function() {
   "use strict";
 
@@ -13,6 +21,24 @@
    * Apply .scrolled class to the body as the page is scrolled down
    */
   document.addEventListener("DOMContentLoaded", async () => {
+    const fetchStudentData = async () => {
+      const { data: user, error } = await supabase.auth.getUser();
+      if(error || !user){
+        signinBtn.style.display = "flex";
+        homeBtn.style.display = "none";
+        signinBtn2.style.display = "flex";
+        homeBtn2.style.display = "none";
+        rsvpLink.href = "student-login.html";
+        return;
+    }
+    homeBtn.style.display = "flex";
+    signinBtn.style.display = "none";
+    signinBtn2.style.display = "none";
+    homeBtn2.style.display = "flex";
+    rsvpLink.href = "events.html";
+
+      }
+    fetchStudentData();
     const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove the `#`
     const accessToken = hashParams.get("access_token");
     const refreshToken = hashParams.get("refresh_token");

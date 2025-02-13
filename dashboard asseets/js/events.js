@@ -4,7 +4,7 @@ const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const ticketFrame = document.getElementById("ticket-frame");
-
+const homeBtn = document.getElementById("home-btn");
 document.addEventListener("DOMContentLoaded", ()=> {
     const fetchUser = async () => {
         const { data: user, error } = await supabase.auth.getUser();
@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", ()=> {
             })
             return;
         }
+        homeBtn.style.display = "flex";
         const { data: ticket, error: fetchError } = await supabase
         .from("Event_Tickets")
         .select("*")

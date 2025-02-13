@@ -5,6 +5,7 @@ const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const uploadForm = document.getElementById("upload-form");
 const display_picture = document.getElementById("profile-pic");
+const logoutBtn = document.getElementById("logout-btn");
 document.addEventListener('DOMContentLoaded', function() {
     function reloadWithoutCache() {
         location.replace(location.pathname + "?nocache=" + new Date().getTime());
@@ -140,7 +141,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     };
 
-
+    logoutBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            Swal.fire({
+                title: "Error!",
+                text: "Error signing out. Please try again.",
+                icon: "error",
+                confirmButtonText: "Okay",
+            });
+            return;
+        }
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    });
     // Call the function to fetch data
     fetchStudentData();
 

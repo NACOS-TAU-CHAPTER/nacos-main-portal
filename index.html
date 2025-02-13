@@ -47,8 +47,8 @@
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
-
-      <a class="btn-getstarted" href="student-login.html" style="text-align: center;">Sign In</a>
+      <a id="home-btn" class="btn-getstarted" href="student-dashboard.html" style="text-align: center;display: none;">Dashboard</a>
+      <a class="btn-getstarted" href="student-login.html" style="text-align: center;" id="signin-btn">Sign In</a>
 
     </div>
   </header>
@@ -65,7 +65,8 @@
           <h1 data-aos="fade-up">Welcome to Thomas Adewumi University's <br><span>Nigerian Association of Computing Students</span></h1>
           <p data-aos="fade-up" data-aos-delay="100"><em>Breeding the innovators of tomorrow's technology.</em><br></p>
           <div class="d-flex" data-aos="fade-up" data-aos-delay="200" style="padding-bottom: 2%;">
-            <a href="student-login.html" class="btn-get-started">Sign In</a>
+            <a href="student-login.html" class="btn-get-started" id="signin-btn2">Sign In</a>
+            <a id="home-btn2" class="btn-get-started" href="student-dashboard.html" style="text-align: center;display: none;">Dashboard</a>
           </div>
           <img src="assets/img/tau_logo-removebg-preview.png" class="img-fluid animated" alt="" data-aos="zoom-out" data-aos-delay="300">
         </div>
@@ -148,15 +149,15 @@
           <div class="col-lg-6 about-images" data-aos="fade-up" data-aos-delay="200">
             <div class="row gy-4">
               <div class="col-lg-6">
-                <img src="assets/img/about-company-1.jpg" class="img-fluid" alt="">
+                <img src="assets/img/DSC_8835-copy2.jpg" class="img-fluid" alt="">
               </div>
               <div class="col-lg-6">
                 <div class="row gy-4">
                   <div class="col-lg-12">
-                    <img src="assets/img/about-company-2.jpg" class="img-fluid" alt="">
+                    <img src="assets/img/DSC_8829.jpg" class="img-fluid" alt="">
                   </div>
                   <div class="col-lg-12">
-                    <img src="assets/img/about-company-3.jpg" class="img-fluid" alt="">
+                    <img src="assets/img/DSC_8871.jpg" class="img-fluid" alt="">
                   </div>
                 </div>
               </div>
@@ -357,7 +358,7 @@
               <div>
                 <h3>Unwind and Connect</h3>
                 <p><em>Upcoming..</em></p>
-                <a href="#" class="read-more stretched-link">RSVP <i class="bi bi-arrow-right"></i></a>
+                <a href="student-login.html" class="read-more stretched-link" id="rsvp-link">RSVP <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -973,7 +974,7 @@
 
   
   <!-- Main JS File -->
-  <script src="assets/js/main.js"></script>
+  <script src="assets/js/main.js" type="module"></script>
 </body>
 
 </html>
