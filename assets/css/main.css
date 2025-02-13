@@ -2205,3 +2205,10 @@ section,
   margin-right: auto;
   margin-left: auto;
 }
+
+.passport{
+  width: 100%; /* Adjust as needed */
+  height: 200px; /* Set a fixed height */
+  object-fit:contain; /* Ensures the image covers the area without distortion */
+  padding-bottom: 5%; /* Maintain the original padding */
+}
