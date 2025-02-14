@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         email,
         password,
         options: {
-          emailRedirectTo: "http://localhost:5500/student-login.html", 
+          emailRedirectTo: "https://nacos-tau-chapter.netlify.app/student-login.html", 
           data: { matric_no: matric_no, full_name: full_name, course: course },
         }
       });
