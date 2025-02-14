@@ -24,6 +24,10 @@
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
+  <!-- font-awesome  -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 </head>
@@ -500,11 +504,67 @@
               <img class="img-fluid passport" src="assets/img/removed-bg/todun.png" alt="" style="padding-bottom: 5%;">
               <h3 style="font-size: large;"><strong>Oluwatodunni Ademilogo OBAFEMI</strong></h3>
               <p class="description"><span style="color: #1b8c0c;"><em>President</em></span></p>
-              <a href="https://www.linkedin.com/in/oluwatodunni-obafemi-717170261/" class="cta-btn">LinkedIn<i class="bi bi-linkedin" style="opacity: 0.5;color: #1b8c0c;padding-left: 5px;"></i></a>
+              <div style="display: flex; flex-direction: row; width: 100%; height: 100%; align-items: center; gap: 10px;">
+                <!-- LinkedIn Button -->
+                <a href="https://www.linkedin.com/in/oluwatodunni-obafemi-717170261/" 
+                   style="width: 45%; display: flex; justify-content: center; align-items: center; border: 1px solid #3d4348; color: #3d4348; padding: 10px 20px; text-align: center; border-radius: 5px; font-weight: 500; text-decoration: none; transition: 0.3s;" 
+                   class="cta-btn"
+                   onmouseover="this.style.backgroundColor='#1b8c0c'; this.style.color='white'; this.style.borderColor='#3d4348';" 
+                   onmouseout="this.style.backgroundColor='transparent'; this.style.color='#1b8c0c'; this.style.borderColor='#3d4348 ';">
+                    LinkedIn<i class="bi bi-linkedin" style="opacity: 0.8; padding-left: 8px;"></i>
+                </a>
+            
+                <!-- GitHub Button -->
+                <a href="https://github.com/your-github" 
+                   style="width: 45%; display: flex; justify-content: center; align-items: center; border: 1px solid #3d4348; color: #3d4348; padding: 10px 20px; text-align: center; border-radius: 5px; font-weight: bold; text-decoration: none; transition: 0.3s;" 
+                   class="cta-btn"
+                   onmouseover="this.style.backgroundColor='#1b8c0c'; this.style.color='white'; this.style.borderColor='#3d4348';" 
+                   onmouseout="this.style.backgroundColor='transparent'; this.style.color='#3d4348'; this.style.borderColor='#3d4348';">
+                    GitHub<i class="bi bi-github" style="opacity: 0.8; padding-left: 8px;"></i>
+                </a>
+
+            </div>
+
+
+            <div style="display: flex; width: 100%; gap: 5px;">
+    <button id="btn1" class="cta-btn" style="flex-direction: row; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; ">
+        <span id="icon1"><i class="bi bi-linkedin" style="opacity: 0.8; padding-left: 8px;"></i></span>
+        <span id="text1" style="display: none; margin-left: 10px;">LinkedIn</span>
+    </button>
+
+    <button id="btn2" class="cta-btn" style="flex-direction: row; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; ">
+        <span id="icon2"><i class="bi bi-github" style="opacity: 0.8; padding-left: 8px;"></i></span>
+        <span id="text2" style="display: none; margin-left: 10px;">Github</span>
+    </button>
+</div>
+
+<script>
+    function expandButton(expanded, collapsed) {
+        document.getElementById(expanded).style.flex = "4";
+        document.getElementById(collapsed).style.flex = "1";
+        document.getElementById("text" + expanded.charAt(expanded.length - 1)).style.display = "inline";
+        document.getElementById("text" + collapsed.charAt(collapsed.length - 1)).style.display = "none";
+    }
+
+    function resetButtons() {
+        document.getElementById("btn1").style.flex = "1";
+        document.getElementById("btn2").style.flex = "1";
+        document.getElementById("text1").style.display = "none";
+        document.getElementById("text2").style.display = "none";
+    }
+
+    document.getElementById("btn1").addEventListener("mouseenter", () => expandButton("btn1", "btn2"));
+    document.getElementById("btn2").addEventListener("mouseenter", () => expandButton("btn2", "btn1"));
+    document.getElementById("btn1").addEventListener("mouseleave", resetButtons);
+    document.getElementById("btn2").addEventListener("mouseleave", resetButtons);
+</script>
+
+</body>
+</html>
             </div>
           </div>
           <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="100">
-            <div class="pricing-item">
+            <div class="pricing-item" style="height: 400px;">
               <img class="img-fluid passport" src="assets/img/removed-bg/hayat.png" alt="" style="padding-bottom: 5%;">
               <h3 style="font-size: large;"><strong>Hayatullah Oluwatoyin SHIRU</strong></h3>
               <p class="description"><span style="color: #1b8c0c;"><em>Vice-President</em></span></p>
@@ -587,7 +647,7 @@
           <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="100">
             <div class="pricing-item">
               <img class="img-fluid passport" src="assets/img/removed-bg/siju.png" alt="" style="padding-bottom: 5%;">
-              <h3 style="font-size: large;"><strong>Sijuwade Micheal ADEBISI</strong></h3>
+              <h3 style="font-size: large;"><strong>Sijuwade Michael ADEBISI</strong></h3>
               <p class="description"><span style="color: #1b8c0c;"><em>Social Director</em></span></p>
               <a href="#" class="cta-btn">LinkedIn<i class="bi bi-linkedin" style="opacity: 0.5;color: #1b8c0c;padding-left: 5px;"></i></a>
             </div>
@@ -602,8 +662,8 @@
           </div>
 
         </div>
-
       </div>
+
 
     </section>
 
