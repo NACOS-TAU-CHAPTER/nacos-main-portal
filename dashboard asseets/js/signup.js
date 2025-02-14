@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
     };
-    signUpStudent(studentEmail, confirm_password.value.trim(), fullName, matricNo, course);
+    signUpStudent(studentEmail.toLowerCase(), confirm_password.value.trim(), fullName, matricNo.toUpperCase(), course);
   });
 });
 

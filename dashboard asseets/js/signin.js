@@ -45,9 +45,9 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
   
           if (error) {
               Swal.fire({
-                title: "Email Not Verified!",
-                text: "Please check your email and confirm your account before logging in.",
-                icon: "warning",
+                title: "Error!",
+                text: "User not found. Please signup before attempting to sign in.",
+                icon: "error",
                 confirmButtonText: "Okay",
               });
               return;
