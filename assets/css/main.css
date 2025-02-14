@@ -175,11 +175,11 @@ h6 {
     font-size: 18px;
   }
   #tau-text{
-    width: 80%;
+    width: 90%;
     display: flex;
   }
   #nacos-text{
-    width: 95%;
+    width: 100%;
     display: flex;
     padding-bottom: 1%;
   }
