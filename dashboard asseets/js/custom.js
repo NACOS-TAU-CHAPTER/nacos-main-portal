@@ -7,13 +7,6 @@ const uploadForm = document.getElementById("upload-form");
 const display_picture = document.getElementById("profile-pic");
 const logoutBtn = document.getElementById("logout-btn");
 document.addEventListener('DOMContentLoaded', function() {
-    const reloadWithoutCache = () => {
-        const imgElement = document.getElementById("display_picture"); // Update this to your actual img element ID
-        if (imgElement) {
-            imgElement.src = imgElement.src.split("?")[0] + `?t=${new Date().getTime()}`;
-        }
-        location.reload();
-    };
     const uploadPfp = async (file) => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
@@ -147,7 +140,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("student-name").textContent = data.name || "Unknown";
         document.getElementById("matric_no").textContent = data.matric_no || "N/A";
         document.getElementById("course").textContent = data.course || "N/A";
-        document.getElementById("display_picture").src = data.display_picture + `?t=${new Date().getTime()}`;
+        if(data.display_picture){
+            document.getElementById("display_picture").src = data.display_picture + `?t=${new Date().getTime()}`;
+        }
     };
 
     logoutBtn.addEventListener("click", async (e) => {
