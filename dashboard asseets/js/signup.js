@@ -64,6 +64,16 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       return;
     }
+    console.log(matricNo.toUpperCase().slice(5, 8) !== "MSC")
+    if (matricNo.toUpperCase().slice(5, 8) !== "MSS" && matricNo.toUpperCase().slice(5, 8) !== "MSC"){
+      Swal.fire({
+        title: "Error!",
+        text: "Your details do not match that of a computing student. Please contact admin.",
+        icon: "error",
+        confirmButtonText: "Okay",
+      });
+      return;
+    }
     const signUpStudent = async (email, password, full_name, matric_no, course) => {
       // Check for email and matric number duplicates
       const { data:existingUser, error:existingUserError } = await supabase
