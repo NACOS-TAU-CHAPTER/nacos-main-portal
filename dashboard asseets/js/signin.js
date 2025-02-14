@@ -112,7 +112,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
           });
           
         }
-        loginStudent(studentEmail, pass_value)
+        loginStudent(studentEmail.toLowerCase(), pass_value)
     });
 });
   
