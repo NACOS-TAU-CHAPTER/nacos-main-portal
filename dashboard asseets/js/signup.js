@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       return;
     }
-    console.log(matricNo.toUpperCase().slice(5, 8) !== "MSC")
+    // console.log(matricNo.toUpperCase().slice(5, 8) !== "MSC")
     if (matricNo.toUpperCase().slice(5, 8) !== "MSS" && matricNo.toUpperCase().slice(5, 8) !== "MSC"){
       Swal.fire({
         title: "Error!",

@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         const matricNo = data.matric_no;
         const rsvp = "RSVP";
-        console.log(userId);
+        // console.log(userId);
         const { data: existingStudent, error: checkError } = await supabase
               .from("Events")
               .select("*")
