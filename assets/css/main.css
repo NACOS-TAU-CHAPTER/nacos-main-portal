@@ -1425,7 +1425,7 @@ section,
 # Pricing Section
 --------------------------------------------------------------*/
 .pricing .pricing-item {
-  background-color: color-mix(in srgb, var(--accent-color), transparent 96%);
+  background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
   padding: 40px 40px;
   height: auto;
   border-radius: 15px;
@@ -2251,4 +2251,71 @@ section,
   line-height: 1; /* Adjusts vertical spacing */
   padding: 0; /* Removes unnecessary padding */
   margin: 0; /* Ensures no extra space */
+}
+
+
+.button-group {
+  display: flex;
+  gap: 5px; /* Adjusts space between buttons */
+  width: 100%;
+  max-width: 300px;
+}
+
+.expandable-btn {
+  flex: 1;
+  transition: flex 0.3s ease-in-out;
+  display: flex;
+  text-decoration: none;
+}
+
+.cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  /* background: #0073b1; LinkedIn color */
+  color: var(--default-color);
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.3s, transform 0.3s, flex 0.3s ease-in-out;
+  overflow: hidden;
+  position: relative;
+}
+
+/* .expandable-btn:nth-child(2) .cta-btn {
+  background: #333; GitHub color
+} */
+
+.icon {
+  font-size: 18px;
+  transition: transform 0.3s;
+}
+
+.text {
+  display: none;
+  margin-left: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Hover Effect */
+.expandable-btn:hover {
+  flex: 1.5;
+}
+
+.expandable-btn:hover .cta-btn {
+  transform: scale(1.05);
+}
+
+.expandable-btn:hover .text {
+  display: inline;
+  opacity: 1;
+}
+
+.expandable-btn:not(:hover) {
+  flex: 0.8;
 }
