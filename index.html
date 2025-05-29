@@ -629,8 +629,24 @@
             <div class="service-item item-cyan position-relative">
               <img src="assets/img/cash_image.png" class="img-fluid icon" alt="" style="border: none;">
               <div>
-                <h3>Account Number</h3>
-                <p><em>1234565768</em></p>
+                <h3>Account Details</h3>
+                <div>
+                  <p>Account Number: 
+                    <strong>1234565768</strong>
+                     <i class="bi bi-copy" 
+                        id="accountNumber" 
+                        style="cursor: pointer; font-size: larger;" 
+                        onclick="navigator.clipboard.writeText('1234565768')">
+                    </i>
+                    <i class="bi bi-check-circle"> Copied to clipboard</i>
+                  </p>
+                </div>
+                <p>Account Name:    <strong>Nigerian Association of Computing Students</strong></p>
+                <p>Bank:            <strong>First Bank</strong></p>
+                <!-- <p>Amount For Association Members: <strong>N2,000</strong></p>
+                <p>Amount For Non-Association Members: <strong>N2,000</strong></p> -->
+                <p>Note: <strong>Please include your full name and matric number as the payment reference.</strong></p>
+
                 <!-- <a href="student-login.html" class="read-more stretched-link" id="rsvp-link">See Details <i class="bi bi-arrow-right"></i></a> -->
               </div>
             </div>
