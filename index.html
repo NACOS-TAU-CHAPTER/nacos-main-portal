@@ -50,6 +50,7 @@
           <li><a href="index.html#about">About</a></li>
           <li><a href="index.html#events">Events</a></li>
           <li><a href="index.html#execs">Executives</a></li>
+          <li><a href="index.html#pays">Payments</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -613,7 +614,7 @@
 
     </section>
 
-    <section id="events" class="services section light-background">
+    <section id="pays" class="services section light-background">
 
       
       <div class="container section-title" data-aos="fade-up">
@@ -632,13 +633,35 @@
                 <h3>Account Details</h3>
                 <div>
                   <p>Account Number: 
-                    <strong>1234565768</strong>
+                    <strong style="padding-right: 2%">1234565768   </strong>
                      <i class="bi bi-copy" 
-                        id="accountNumber" 
-                        style="cursor: pointer; font-size: larger;" 
-                        onclick="navigator.clipboard.writeText('1234565768')">
-                    </i>
-                    <i class="bi bi-check-circle"> Copied to clipboard</i>
+                              id="accountNumberIcon" 
+                              style="cursor: pointer; font-size: larger;" 
+                              onclick="copyToClipboard()">
+                            </i>
+                            <i class="bi bi-check-circle" 
+                              id="copyMsg" 
+                              style="display: none; color: green; margin-left: 10px;">
+                              Copied to clipboard
+                            </i>
+
+                            <script>
+                              function copyToClipboard() {
+                                const copyIcon = document.getElementById('accountNumberIcon');
+                                const msg = document.getElementById('copyMsg');
+
+                                navigator.clipboard.writeText('1234565768').then(() => {
+                                  copyIcon.style.display = 'none';
+                                  msg.style.display = 'inline';
+
+                                  setTimeout(() => {
+                                    msg.style.display = 'none';
+                                    copyIcon.style.display = 'inline';
+                                  }, 4000); // Show message for 2 seconds
+                                });
+                              }
+                            </script>
+
                   </p>
                 </div>
                 <p>Account Name:    <strong>Nigerian Association of Computing Students</strong></p>
