@@ -221,3 +221,25 @@ const homeBtn2 = document.getElementById("home-btn2");
 
 
 })();
+
+
+
+
+// for the events stuff
+document.addEventListener("DOMContentLoaded", function () {
+    // Get all event blocks
+    const events = document.querySelectorAll('.service-item');
+
+    events.forEach(event => {
+      const description = event.querySelector('p em')?.textContent.toLowerCase();
+      const link = event.querySelector('a.read-more');
+
+      if (description && description.includes('upcoming')) {
+        // Hide the link
+        link.style.display = 'none';
+      }
+      else {
+        link.style.display = 'block'; 
+      }
+    });
+  });

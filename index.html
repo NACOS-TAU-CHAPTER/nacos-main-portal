@@ -50,6 +50,7 @@
           <li><a href="index.html#about">About</a></li>
           <li><a href="index.html#events">Events</a></li>
           <li><a href="index.html#execs">Executives</a></li>
+          <li><a href="index.html#pays">Payments</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -66,12 +67,12 @@
       <div class="hero-bg">
         <img src="assets/img/tau sample image.jpg" alt="">
       </div>
-      <div class="container text-center">
+      <div class="container text-center " style="padding-bottom: 50px;">
         <div class="d-flex flex-column justify-content-center align-items-center">
           <h1 data-aos="fade-up">Welcome to Thomas Adewumi University's <br><span>Nigerian Association of Computing Students</span></h1>
           <p data-aos="fade-up" data-aos-delay="100"><em>Breeding the innovators of tomorrow's technology.</em><br></p>
           <div class="d-flex" data-aos="fade-up" data-aos-delay="200" style="padding-bottom: 2%;">
-            <a href="student-login.html" class="btn-get-started" id="signin-btn2">Sign In</a>
+            <!-- <a href="student-login.html" class="btn-get-started" id="signin-btn2">Sign In</a> -->
             <a id="home-btn2" class="btn-get-started" href="student-dashboard.html" style="text-align: center;display: none;">Dashboard</a>
           </div>
           <img src="assets/img/tau_logo-removebg-preview.png" class="img-fluid animated" alt="" data-aos="zoom-out" data-aos-delay="300">
@@ -363,8 +364,28 @@
               <img src="assets/img/hangout.png" class="img-fluid icon" alt="" style="border: none;">
               <div>
                 <h3>Unwind and Connect</h3>
-                <p><em>Upcoming..</em></p>
-                <a href="student-login.html" class="read-more stretched-link" id="rsvp-link">RSVP <i class="bi bi-arrow-right"></i></a>
+                <p><em><i class="bi bi-check-circle"></i> 15th February 2025</em></p>
+                <a href="" class="read-more stretched-link" id="rsvp-link">See Details <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100" style="width: 100%; cursor:pointer ;">
+            <div class="service-item item-cyan position-relative">
+              <img src="assets/img/events/Symposium Prt 1.png" class="img-fluid icon" alt="" style="border: none;">
+              <div>
+                <h3>Symposium: The Age of Artificial Intelligence (PART I) </h3>
+                <p><em>Upcoming: 2nd June 2025</em></p>
+                <a href="" class="read-more stretched-link" id="rsvp-link">See Details <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100" style="width: 100%; cursor: pointer;">
+            <div class="service-item item-cyan position-relative">
+              <img src="assets/img/events/NACOS Week Flyer.png" class="img-fluid icon" alt="" style="border: none;">
+              <div>
+                <h3>NACOS Week</h3>
+                <p><em>Upcoming:  16th June - 21st June 2025 </em></p>
+                <a href="" class="read-more stretched-link" id="rsvp-link">See Details <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -612,6 +633,157 @@
       </div>
 
     </section>
+
+    <section id="pays" class="services section light-background">
+
+      
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Payments</h2>
+        <p>Make your payments easily and securely.</p>
+      </div>
+
+      <div class="container">
+
+        <div class="row g-5">
+
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100" style="width: 100%;">
+            <div class="service-item item-cyan position-relative">
+              <div class="justify-content-center align-items-center d-flex flex-column" style="margin: auto;">
+                <img src="assets/img/cash_image.png" class="img-fluid icon" alt="" style="border: none; width: 20%; height: 50%;">
+              <div>
+                <h3 class="" style="display: flex; margin: auto; justify-content: center; align-items: center;">Account Details</h3>
+                <div>
+                  <p>Account Number: 
+                    <strong style="padding-right: 2%">0118670866   </strong>
+                     <i class="bi bi-copy" 
+                              id="accountNumberIcon" 
+                              style="cursor: pointer; font-size: larger;" 
+                              onclick="copyToClipboard()">
+                            </i>
+                            <i class="bi bi-check-circle" 
+                              id="copyMsg" 
+                              style="display: none; color: green; margin-left: 10px;">
+                              Copied to clipboard
+                            </i>
+
+                            <script>
+                              function copyToClipboard() {
+                                const copyIcon = document.getElementById('accountNumberIcon');
+                                const msg = document.getElementById('copyMsg');
+
+                                navigator.clipboard.writeText('0118670866').then(() => {
+                                  copyIcon.style.display = 'none';
+                                  msg.style.display = 'inline';
+                                  setTimeout(() => {
+                                    msg.style.display = 'none';
+                                    copyIcon.style.display = 'inline';
+                                  }, 4000); // Show message for 2 seconds
+                                });
+                              }
+                            </script>
+
+                  </p>
+                </div>
+                <p>Account Name:    <strong>Nigerian Association of Computing Students - TAU</strong></p>
+                <p>Bank:            <strong>Sterling Bank</strong></p>
+                <!-- <p>Amount For Association Members: <strong>N2,000</strong></p>
+                <p>Amount For Non-Association Members: <strong>N2,000</strong></p> -->
+                <p>Note: <strong>Please include your full name, matric number and purpose of payment as the payment reference.</strong></p>
+                <small style="display: flex; margin: auto; justify-content: center; align-items: center;"><em>Payment Reference: <strong>NACOS-TAU | 11/22TAU33 | Association Fee</strong></em></small>
+
+                <!-- <a href="student-login.html" class="read-more stretched-link" id="rsvp-link">See Details <i class="bi bi-arrow-right"></i></a> -->
+
+
+
+                <div class="" style="padding-top: 10%;">
+                  <div>
+                    <h5>Please kindly fill the form related to the payment made. Thank you!</h5>
+                    <p><strong>Association Fee:</strong> </p>
+                    <p><strong>Dinner Fee:</strong> </p>
+                  </div>
+                  <br>
+                  <hr>
+                  <div >
+                    <!-- style="text-align: right;" -->
+                    <strong>For any inquiries, please reach out through: </strong>
+                    <p class="contact-info">
+                      <a href="mailto:nacos@tau.edu.ng" target="_blank">nacos@tau.edu.ng</a> <br>
+                      <a href="https://wa.me/" target="_blank">The President</a> <br>
+                      <a href="https://wa.link/rn8tl1" target="_blank">The General Secretary</a> <br>
+                      <a href="https://wa.link/pr7d64" target="_blank">The Asst. General Secretary</a>
+                      
+                    </p>
+
+                  </div>
+                </div>
+
+              </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-item item-orange position-relative">
+              <i class="bi bi-broadcast icon"></i>
+              <div>
+                <h3>Eosle Commodi</h3>
+                <p>Ut autem aut autem non a. Sint sint sit facilis nam iusto sint. Libero corrupti neque eum hic non ut nesciunt dolorem.</p>
+                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="service-item item-teal position-relative">
+              <i class="bi bi-easel icon"></i>
+              <div>
+                <h3>Ledo Markt</h3>
+                <p>Ut excepturi voluptatem nisi sed. Quidem fuga consequatur. Minus ea aut. Vel qui id voluptas adipisci eos earum corrupti.</p>
+                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+            <div class="service-item item-red position-relative">
+              <i class="bi bi-bounding-box-circles icon"></i>
+              <div>
+                <h3>Asperiores Commodi</h3>
+                <p>Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga sit provident adipisci neque.</p>
+                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="500">
+            <div class="service-item item-indigo position-relative">
+              <i class="bi bi-calendar4-week icon"></i>
+              <div>
+                <h3>Velit Doloremque.</h3>
+                <p>Cumque et suscipit saepe. Est maiores autem enim facilis ut aut ipsam corporis aut. Sed animi at autem alias eius labore.</p>
+                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="600">
+            <div class="service-item item-pink position-relative">
+              <i class="bi bi-chat-square-text icon"></i>
+              <div>
+                <h3>Dolori Architecto</h3>
+                <p>Hic molestias ea quibusdam eos. Fugiat enim doloremque aut neque non et debitis iure. Corrupti recusandae ducimus enim.</p>
+                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div> -->
+
+        </div>
+
+      </div>
+
+    </section>
+
+
 
     <!-- Faq Section -->
     <!-- <section id="faq" class="faq section">
