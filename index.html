@@ -1236,96 +1236,108 @@
                   <div class="container d-flex justify-content-center" style="margin-top: 30px; margin-bottom: 30px;">
                     <a href="votingform.html" class="btn btn-success w-50 py-3 d-block" style="font-weight: 600; box-shadow: 0 0 20px rgba(0,0,0,0.1); border: none;">Vote</a>
                   </div>
-                  <script>
+                  <script type="module">
+                    const supabaseClient = window.supabase;
 
-                    let voteChartInstance = null;
+                    let voteChartInstance;
 
-                    function loadVoteChart() {
-                      fetch('fetch_top_per_category.php')
-                        .then(response => response.json())
-                        .then(data => {
-                            const labels = data.map(
-                                item => item.candidate_name
-                            );
+                    const categoryLabels = {
+                      'tech-innovator': 'Tech Innovator of the year',
+                      'faculty-icon': 'Faculty Icon of the year',
+                      'sportsman': 'Sportsman of the Year',
+                      'course-rep': 'Best Course Representative',
+                      'best-dressed-male': 'Best Dressed Male of the Faculty',
+                      'best-dressed-female': 'Best Dressed Female of the Faculty',
+                      'best-lecturer': 'Best Lecturer of the year',
+                      'most-influential': 'Most Influential',
+                      'outstanding-executive': 'Outstanding Executive of the year',
+                      'most-popular': 'Most Popular Figure',
+                      'programmer-of-the-year': 'Programmer of the year'
+                    };
 
-                            const voteData = data.map(
-                                item => item.votes
-                            );
+                    async function fetchVotes() {
+                      const { data, error } = await supabaseClient
+                        .from('votes')
+                        .select('*');
 
-                            const ctx = document
-                                .getElementById('voteChart')
-                                .getContext('2d');
+                      if (error) {
+                        console.error(error);
+                        return;
+                      }
 
-                            if (voteChartInstance) {
-                              voteChartInstance.destroy();
-                            }
+                      const topByCategory = {};
 
-                            voteChartInstance = new Chart(ctx, {
+                      data.forEach((item) => {
+                        const existing = topByCategory[item.category];
+                        if (!existing || item.vote_amount > existing.vote_amount) {
+                          topByCategory[item.category] = item;
+                        }
+                      });
 
-                                type: 'bar',
+                      const labels = [];
+                      const voteData = [];
+                      const tooltipCategories = [];
 
-                                data: {
+                      Object.keys(categoryLabels).forEach((category) => {
+                        const top = topByCategory[category];
+                        const candidateName = top?.candidate_name || 'No votes';
 
-                                    labels: labels,
+                        labels.push(candidateName);
+                        voteData.push(top?.vote_amount ?? 0);
+                        tooltipCategories.push(categoryLabels[category]);
+                      });
 
-                                    datasets: [{
+                      renderChart(labels, voteData, tooltipCategories);
+                    }
 
-                                        label: 'Votes',
+                    function renderChart(labels, voteData, tooltipCategories) {
+                      const ctx = document
+                        .getElementById('voteChart')
+                        .getContext('2d');
 
-                                        data: voteData,
+                      if (voteChartInstance) {
+                        voteChartInstance.destroy();
+                      }
 
-                                        borderWidth: 1,
-
-                                        borderRadius: 10,
-
-                                        backgroundColor:
-                                            'rgba(31,97,255,0.75)',
-
-                                        borderColor:
-                                            'rgba(31,97,255,1)'
-
-                                    }]
-
+                      voteChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                          labels: labels,
+                          datasets: [{
+                            label: 'Votes',
+                            data: voteData,
+                            borderWidth: 1,
+                            borderRadius: 10
+                          }]
+                        },
+                        options: {
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            tooltip: {
+                              callbacks: {
+                                title: (items) => {
+                                  const index = items[0]?.dataIndex;
+                                  return tooltipCategories[index] || '';
                                 },
-
-                                options: {
-
-                                    responsive: true,
-
-                                    maintainAspectRatio: false,
-
-                                    plugins: {
-
-                                        legend: {
-                                            display: false
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: 'Top Candidate Per Category'
-                                        }
-
-                                    },
-
-                                    scales: {
-
-                                        y: {
-                                            beginAtZero: true,
-                                            ticks: {
-                                                precision: 0
-                                            }
-                                        }
-
-                                    }
-
+                                label: (item) => {
+                                  return `Votes: ${item.formattedValue}`;
                                 }
-
-                            });
-
-                        });
+                              }
+                            }
+                          },
+                          scales: {
+                            y: {
+                              beginAtZero: true
+                            }
+                          }
+                        }
+                      });
                     }
 
                     document.addEventListener('DOMContentLoaded', function() {
-                      loadVoteChart();
+                      fetchVotes();
+                      setInterval(fetchVotes, 5000);
                     });
 
                   </script>
@@ -1579,7 +1591,7 @@
           </div>
 
           <div class="col-lg-6">
-            <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="400">
+            <form id="contactForm" class="php-email-form" data-aos="fade-up" data-aos-delay="400">
               <div class="row gy-4">
 
                 <div class="col-md-6">
@@ -1599,7 +1611,7 @@
                 </div>
 
                 <div class="col-md-12 text-center">
-                  <div class="loading">Loading</div>
+                  <div class="loading"></div>
                   <div class="error-message"></div>
                   <div class="sent-message">Your message has been sent. Thank you!</div>
 
@@ -1691,9 +1703,9 @@
           <!-- <div class="col-lg-4 col-md-12 footer-newsletter">
           <h4>Our Newsletter</h4>
           <p>Subscribe to our newsletter and receive the latest news about our products and services!</p>
-          <form action="forms/newsletter.php" method="post" class="php-email-form">
-            <div class="newsletter-form"><input type="email" name="email"><input type="submit" value="Subscribe"></div>
-            <div class="loading">Loading</div>
+          <form id="newsletterForm" class="php-email-form">
+            <div class="newsletter-form"><input type="email" name="email" required=""><input type="submit" value="Subscribe"></div>
+            <div class="loading"></div>
             <div class="error-message"></div>
             <div class="sent-message">Your subscription request has been sent. Thank you!</div>
           </form>
@@ -1741,14 +1753,45 @@
     </script>
     <script src="assets/vendor/swiper/swiper-bundle.min.js">
     </script>
-    <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js">
-    </script>
-    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js">
-    </script>
+    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+    <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
     <!-- Chart.js Library -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="supabase.js"></script>
     <!-- Main JS File -->
     <script src="assets/js/main.js" type="module">
+    </script>
+    
+    <script type="module">
+      import handleContactForm from './js/contact.js';
+
+      const contactForm = document.getElementById('contactForm');
+
+      if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const formData = new FormData(contactForm);
+          const result = await handleContactForm(formData);
+
+          if (result.success) {
+            contactForm.classList.add('sent-message');
+            contactForm.reset();
+            setTimeout(() => {
+              contactForm.classList.remove('sent-message');
+            }, 5000);
+          } else {
+            // Show error message
+            const errorDiv = contactForm.querySelector('.error-message');
+            if (errorDiv) {
+              errorDiv.textContent = result.message;
+              errorDiv.style.display = 'block';
+            }
+            alert(result.message);
+          }
+        });
+      }
     </script>
   </body>
 </html>

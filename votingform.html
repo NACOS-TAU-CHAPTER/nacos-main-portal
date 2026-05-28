@@ -26,13 +26,15 @@
       </h2>
 
       <!-- Voting Form -->
-      <form action="submit_votes.php" method="POST">
+      <form id="votingForm">
 
         <!-- Tech Innovator of the year -->
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Tech Innovator of the year</label>
-            <input type="text" class="form-control" name="tech-innovator" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="tech-innovator" data-category="tech-innovator" required>
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
@@ -44,7 +46,9 @@
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Faculty Icon of the year</label>
-            <input type="text" class="form-control" name="faculty-icon" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="faculty-icon" data-category="faculty-icon" required>
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
@@ -56,7 +60,9 @@
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Sportsman of the Year</label>
-            <input type="text" class="form-control" name="sportsman" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="sportsman" data-category="sportsman" required>
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
@@ -68,7 +74,9 @@
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Best Course Representative</label>
-            <input type="text" class="form-control" name="course-rep" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="course-rep" data-category="course-rep" required>
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
@@ -80,7 +88,9 @@
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Best Dressed Male of the Faculty</label>
-            <input type="text" class="form-control" name="best-dressed-male" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="best-dressed-male" data-category="best-dressed-male" required>
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
@@ -92,7 +102,9 @@
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Best Dressed Female of the Faculty</label>
-            <input type="text" class="form-control" name="best-dressed-female" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="best-dressed-female" data-category="best-dressed-female" required>
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
@@ -104,7 +116,9 @@
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Best Lecturer of the year</label>
-            <input type="text" class="form-control" name="best-lecturer" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="best-lecturer" data-category="best-lecturer">
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
@@ -116,7 +130,9 @@
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Most Influential</label>
-            <input type="text" class="form-control" name="most-influential" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="most-influential" data-category="most-influential" required>
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
@@ -128,7 +144,9 @@
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Outstanding Executive of the year</label>
-            <input type="text" class="form-control" name="outstanding-executive" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="outstanding-executive" data-category="outstanding-executive" required>
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
@@ -140,11 +158,27 @@
         <div class="row mb-4">
           <div class="col-md-8 mb-3 mb-md-0">
             <label class="form-label">Most Popular Figure</label>
-            <input type="text" class="form-control" name="most-popular" placeholder="Enter candidate name" required>
+            <select class="form-select candidate-select" name="most-popular" data-category="most-popular" required>
+              <option value="">Select candidate</option>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Vote amount</label>
             <input type="number" class="form-control" name="most-popular-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Programmer of the year -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Programmer of the year</label>
+            <select class="form-select candidate-select" name="programmer-of-the-year" data-category="programmer-of-the-year" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="programmer-of-the-year-amount" min="1" value="1" required>
           </div>
         </div>
 
@@ -158,6 +192,132 @@
     </div>
 
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase.js"></script>
+  <script>
+    async function loadCandidateOptions() {
+      if (!window.supabase) {
+        console.error('Supabase client not initialized');
+        return;
+      }
+
+      const defaultCandidates = {
+        'tech-innovator': [
+          'Akinlotan Victor',
+          'Ajetomobi praise',
+          'Samuel',
+          'Nabeel'
+        ],
+        'faculty-icon': [
+          'Hayat',
+          'Father KD',
+          'Eri',
+          'Ajetomobi praise'
+        ],
+        'sportsman': [
+          'Al Amen',
+          'Williams',
+          'Ibadan',
+          'Father KD'
+        ],
+        'course-rep': [
+          'Henry',
+          'Faiz',
+          'Daniel',
+          'Michael'
+        ],
+        'best-dressed-male': [
+          'Tech Kingsley',
+          'Siraj',
+          'Quayum',
+          'Femi'
+        ],
+        'best-dressed-female': [
+          'Stephanie',
+          'Daniella',
+          'Khadijah',
+          'Ike Oluwa'
+        ],
+        'most-influential': [
+          'KD',
+          'Femi',
+          'Siraj',
+          'Henry'
+        ],
+        'outstanding-executive': [
+          'Hayat',
+          'Praise',
+          'Stephanie',
+          'Daniella'
+        ],
+        'most-popular': [
+          'Siraj',
+          'KD',
+          'Femi',
+          'Ibadan'
+        ],
+        'programmer-of-the-year': [
+          'Akinlotan Victor',
+          'Eri',
+          'Phillip success',
+          'Tech Kingsley'
+        ]
+      };
+
+      const selects = document.querySelectorAll('.candidate-select');
+      for (const select of selects) {
+        const category = select.dataset.category;
+        if (!category) continue;
+
+        const { data, error } = await window.supabase
+          .from('votes')
+          .select('candidate_name')
+          .eq('category', category)
+          .order('candidate_name', { ascending: true });
+
+        if (error) {
+          console.error('Error loading candidate options for', category, error);
+          continue;
+        }
+
+        const dbNames = [...new Set((data || []).map(row => row.candidate_name).filter(Boolean))];
+        const defaultNames = defaultCandidates[category] || [];
+        const names = [...new Set([...defaultNames, ...dbNames])];
+
+        const options = ['<option value="">Select candidate</option>'];
+        names.forEach((name) => {
+          options.push(`<option value="${name}">${name}</option>`);
+        });
+
+        select.innerHTML = options.join('');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCandidateOptions);
+  </script>
+  <script type="module">
+    import submitVotes from './js/submit-votes.js';
+
+    const votingForm = document.getElementById('votingForm');
+
+    votingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(votingForm);
+      const result = await submitVotes(formData);
+
+      if (result.success) {
+        // Show success message
+        alert(result.message);
+        // Redirect to index page
+        window.location.href = result.redirect;
+      } else {
+        // Show error message
+        alert(result.message);
+      }
+    });
+  </script>
 
 </body>
 
