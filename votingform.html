@@ -112,19 +112,7 @@
           </div>
         </div>
 
-        <!-- Best Lecturer of the year -->
-        <div class="row mb-4">
-          <div class="col-md-8 mb-3 mb-md-0">
-            <label class="form-label">Best Lecturer of the year</label>
-            <select class="form-select candidate-select" name="best-lecturer" data-category="best-lecturer">
-              <option value="">Select candidate</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Vote amount</label>
-            <input type="number" class="form-control" name="best-lecturer-amount" min="1" value="1" required>
-          </div>
-        </div>
+        <!-- Best Lecturer removed -->
 
         <!-- Most Influential -->
         <div class="row mb-4">
@@ -296,26 +284,46 @@
 
     document.addEventListener('DOMContentLoaded', loadCandidateOptions);
   </script>
-  <script type="module">
-    import submitVotes from './js/submit-votes.js';
-
-    const votingForm = document.getElementById('votingForm');
-
-    votingForm.addEventListener('submit', async (e) => {
+  <script>
+    // Payment redirect flow: save votes to localStorage then redirect to Selar product
+    document.getElementById('votingForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      
-      const formData = new FormData(votingForm);
-      const result = await submitVotes(formData);
 
-      if (result.success) {
-        // Show success message
-        alert(result.message);
-        // Redirect to index page
-        window.location.href = result.redirect;
-      } else {
-        // Show error message
-        alert(result.message);
-      }
+      const fields = [
+        'tech-innovator',
+        'faculty-icon',
+        'sportsman',
+        'course-rep',
+        'best-dressed-male',
+        'best-dressed-female',
+        'most-influential',
+        'outstanding-executive',
+        'most-popular',
+        'programmer-of-the-year'
+      ];
+
+      const votes = [];
+
+      fields.forEach((field) => {
+        const candidateEl = document.querySelector(`[name="${field}"]`);
+        const amountEl = document.querySelector(`[name="${field}-amount"]`);
+        const candidate = candidateEl ? (candidateEl.value || '').trim() : '';
+        const amount = amountEl ? (parseInt(amountEl.value, 10) || 1) : 1;
+
+        if (candidate) {
+          votes.push({
+            category: field,
+            candidate_name: candidate,
+            vote_amount: amount
+          });
+        }
+      });
+
+      // Save pending votes locally and redirect to Selar
+      localStorage.setItem('pendingVotes', JSON.stringify(votes));
+
+      // Selar product link (provided)
+      window.location.href = 'https://selar.com/8709817974';
     });
   </script>
 

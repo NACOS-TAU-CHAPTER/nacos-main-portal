@@ -11,7 +11,6 @@ export async function fetchTopPerCategory() {
     'course-rep': 'Course Rep',
     'best-dressed-male': 'Best Dressed Male',
     'best-dressed-female': 'Best Dressed Female',
-    'best-lecturer': 'Best Lecturer',
     'most-influential': 'Most Influential',
     'outstanding-executive': 'Outstanding Executive',
     'most-popular': 'Most Popular'

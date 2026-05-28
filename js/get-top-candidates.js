@@ -11,7 +11,6 @@ export async function getTopCandidates() {
     'course-rep',
     'best-dressed-male',
     'best-dressed-female',
-    'best-lecturer',
     'most-influential',
     'outstanding-executive',
     'most-popular'

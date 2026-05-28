@@ -10,7 +10,6 @@ export async function submitVotes(formData) {
     'course-rep',
     'best-dressed-male',
     'best-dressed-female',
-    'best-lecturer',
     'most-influential',
     'outstanding-executive',
     'most-popular',

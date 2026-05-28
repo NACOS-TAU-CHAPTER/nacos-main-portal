@@ -10,7 +10,6 @@ const categories = {
   'course-rep': 'Best Course Representative',
   'best-dressed-male': 'Best Dressed Male of the Faculty',
   'best-dressed-female': 'Best Dressed Female of the Faculty',
-  'best-lecturer': 'Best Lecturer of the year',
   'most-influential': 'Most Influential',
   'outstanding-executive': 'Outstanding Executive of the year',
   'most-popular': 'Most Popular Figure'
