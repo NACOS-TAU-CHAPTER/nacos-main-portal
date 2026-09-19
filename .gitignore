@@ -35,7 +35,11 @@ node_modules/
 .env.local
 # IDE 
 .vscode/ 
-.idea/ 
+.idea/
+
+# Exclude next-app (not part of this project)
+next-app/
+.kiro/ 
  
 # OS 
 .DS_Store 
