@@ -6,8 +6,8 @@
 * License: https://bootstrapmade.com/license/
 */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const supabaseUrl = "https://dgsipldaivnwxoyodzcw.supabase.co";
-const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnc2lwbGRhaXZud3hveW9kemN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5MzExODEsImV4cCI6MjA1NDUwNzE4MX0.1YLPU_OhyG2CFwf8C4odEstPhL9Ico9lNYK8Lwg-AD0";
+const supabaseUrl = "https://ajstuebuqxiftylnzdoy.supabase.co";
+const supabaseAnonKey = "sb_publishable_IbEZwBvhZzrtHXJL52iwCA_TpNCWW5i";
 const homeBtn = document.getElementById("home-btn");
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const rsvpLink = document.getElementById("rsvp-link");
@@ -23,19 +23,19 @@ const homeBtn2 = document.getElementById("home-btn2");
   document.addEventListener("DOMContentLoaded", async () => {
     const fetchStudentData = async () => {
       const { data: user, error } = await supabase.auth.getUser();
-      if(error || !user){
-        signinBtn.style.display = "flex";
-        homeBtn.style.display = "none";
-        signinBtn2.style.display = "flex";
-        homeBtn2.style.display = "none";
-        rsvpLink.href = "student-login.html";
+      if (error || !user) {
+        if (signinBtn) signinBtn.style.display = "flex";
+        if (homeBtn) homeBtn.style.display = "none";
+        if (signinBtn2) signinBtn2.style.display = "flex";
+        if (homeBtn2) homeBtn2.style.display = "none";
+        if (rsvpLink) rsvpLink.href = "student-login.html";
         return;
-    }
-    homeBtn.style.display = "flex";
-    signinBtn.style.display = "none";
-    signinBtn2.style.display = "none";
-    homeBtn2.style.display = "flex";
-    rsvpLink.href = "events.html";
+      }
+      if (homeBtn) homeBtn.style.display = "flex";
+      if (signinBtn) signinBtn.style.display = "none";
+      if (signinBtn2) signinBtn2.style.display = "none";
+      if (homeBtn2) homeBtn2.style.display = "flex";
+      if (rsvpLink) rsvpLink.href = "events.html";
 
       }
     fetchStudentData();
@@ -56,6 +56,7 @@ const homeBtn2 = document.getElementById("home-btn2");
   function toggleScrolled() {
     const selectBody = document.querySelector('body');
     const selectHeader = document.querySelector('#header');
+    if (!selectHeader) return;
     if (!selectHeader.classList.contains('scroll-up-sticky') && !selectHeader.classList.contains('sticky-top') && !selectHeader.classList.contains('fixed-top')) return;
     window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
   }
@@ -69,11 +70,14 @@ const homeBtn2 = document.getElementById("home-btn2");
   const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
 
   function mobileNavToogle() {
-    document.querySelector('body').classList.toggle('mobile-nav-active');
-    mobileNavToggleBtn.classList.toggle('bi-list');
-    mobileNavToggleBtn.classList.toggle('bi-x');
+    const bodyEl = document.querySelector('body');
+    if (bodyEl) bodyEl.classList.toggle('mobile-nav-active');
+    if (mobileNavToggleBtn) {
+      mobileNavToggleBtn.classList.toggle('bi-list');
+      mobileNavToggleBtn.classList.toggle('bi-x');
+    }
   }
-  mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
+  if (mobileNavToggleBtn) mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
 
   /**
    * Hide mobile nav on same-page/hash links
@@ -119,13 +123,15 @@ const homeBtn2 = document.getElementById("home-btn2");
       window.scrollY > 100 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
     }
   }
-  scrollTop.addEventListener('click', (e) => {
-    e.preventDefault();
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
+  if (scrollTop) {
+    scrollTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     });
-  });
+  }
 
   window.addEventListener('load', toggleScrollTop);
   document.addEventListener('scroll', toggleScrollTop);
@@ -231,15 +237,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const events = document.querySelectorAll('.service-item');
 
     events.forEach(event => {
-      const description = event.querySelector('p em')?.textContent.toLowerCase();
-      const link = event.querySelector('a.read-more');
+        const description = event.querySelector('p em')?.textContent.toLowerCase();
+        const link = event.querySelector('a.read-more');
 
-      if (description && description.includes('upcoming')) {
-        // Hide the link
-        link.style.display = 'none';
-      }
-      else {
-        link.style.display = 'block'; 
-      }
+        if (!link) return;
+
+        if (description && description.includes('upcoming')) {
+          // Hide the link
+          link.style.display = 'none';
+        } else {
+          link.style.display = 'block'; 
+        }
     });
   });

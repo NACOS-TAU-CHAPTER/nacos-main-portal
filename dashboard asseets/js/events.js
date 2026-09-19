@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const supabaseUrl = "https://dgsipldaivnwxoyodzcw.supabase.co";
-const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnc2lwbGRhaXZud3hveW9kemN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5MzExODEsImV4cCI6MjA1NDUwNzE4MX0.1YLPU_OhyG2CFwf8C4odEstPhL9Ico9lNYK8Lwg-AD0";
+const supabaseUrl = "https://ajstuebuqxiftylnzdoy.supabase.co";
+const supabaseAnonKey = "sb_publishable_IbEZwBvhZzrtHXJL52iwCA_TpNCWW5i";
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const ticketFrame = document.getElementById("ticket-frame");

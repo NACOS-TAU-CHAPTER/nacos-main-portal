@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Vote Form</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body style="background:#f4f7fa;">
+
+  <div class="container py-5">
+
+    <div class="card shadow-lg border-0 rounded-4 p-5">
+      <div class="d-flex justify-content-start mb-4">
+        <a href="index.html" class="btn btn-outline-success">
+          Home
+        </a>
+      </div>
+      <h2 class="text-center mb-4">
+        The NACTA Awards 2026 (NACOS TAU Awards )
+      </h2>
+
+      <!-- Voting Form -->
+      <form id="votingForm">
+
+        <!-- Tech Innovator of the year -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Tech Innovator of the year</label>
+            <select class="form-select candidate-select" name="tech-innovator" data-category="tech-innovator" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="tech-innovator-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Faculty icon of the year -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Faculty Icon of the year</label>
+            <select class="form-select candidate-select" name="faculty-icon" data-category="faculty-icon" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="faculty-icon-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Sportsman of the Year -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Sportsman of the Year</label>
+            <select class="form-select candidate-select" name="sportsman" data-category="sportsman" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="sportsman-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Best Course Representative -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Best Course Representative</label>
+            <select class="form-select candidate-select" name="course-rep" data-category="course-rep" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="course-rep-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Best Dressed Male of the Faculty -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Best Dressed Male of the Faculty</label>
+            <select class="form-select candidate-select" name="best-dressed-male" data-category="best-dressed-male" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="best-dressed-male-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Best Dressed Female of the Faculty -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Best Dressed Female of the Faculty</label>
+            <select class="form-select candidate-select" name="best-dressed-female" data-category="best-dressed-female" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="best-dressed-female-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Best Lecturer removed -->
+
+        <!-- Most Influential -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Most Influential</label>
+            <select class="form-select candidate-select" name="most-influential" data-category="most-influential" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="most-influential-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Outstanding executive of the year -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Outstanding Executive of the year</label>
+            <select class="form-select candidate-select" name="outstanding-executive" data-category="outstanding-executive" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="outstanding-executive-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Most Popular figure -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Most Popular Figure</label>
+            <select class="form-select candidate-select" name="most-popular" data-category="most-popular" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="most-popular-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Programmer of the year -->
+        <div class="row mb-4">
+          <div class="col-md-8 mb-3 mb-md-0">
+            <label class="form-label">Programmer of the year</label>
+            <select class="form-select candidate-select" name="programmer-of-the-year" data-category="programmer-of-the-year" required>
+              <option value="">Select candidate</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Vote amount</label>
+            <input type="number" class="form-control" name="programmer-of-the-year-amount" min="1" value="1" required>
+          </div>
+        </div>
+
+        <!-- Payment Button -->
+        <button type="submit" class="btn btn-success w-100 py-3">
+          Proceed To Payment
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase.js"></script>
+  <script>
+    async function loadCandidateOptions() {
+      if (!window.supabase) {
+        console.error('Supabase client not initialized');
+        return;
+      }
+
+      const defaultCandidates = {
+        'tech-innovator': [
+          'Akinlotan Victor',
+          'Ajetomobi praise',
+          'Samuel',
+          'Nabeel'
+        ],
+        'faculty-icon': [
+          'Hayat',
+          'Father KD',
+          'Eri',
+          'Ajetomobi praise'
+        ],
+        'sportsman': [
+          'Al Amen',
+          'Williams',
+          'Ibadan',
+          'Father KD'
+        ],
+        'course-rep': [
+          'Henry',
+          'Faiz',
+          'Daniel',
+          'Michael'
+        ],
+        'best-dressed-male': [
+          'Tech Kingsley',
+          'Siraj',
+          'Quayum',
+          'Femi'
+        ],
+        'best-dressed-female': [
+          'Stephanie',
+          'Daniella',
+          'Khadijah',
+          'Ike Oluwa'
+        ],
+        'most-influential': [
+          'KD',
+          'Femi',
+          'Siraj',
+          'Henry'
+        ],
+        'outstanding-executive': [
+          'Hayat',
+          'Praise',
+          'Stephanie',
+          'Daniella'
+        ],
+        'most-popular': [
+          'Siraj',
+          'KD',
+          'Femi',
+          'Ibadan'
+        ],
+        'programmer-of-the-year': [
+          'Akinlotan Victor',
+          'Eri',
+          'Phillip success',
+          'Tech Kingsley'
+        ]
+      };
+
+      const selects = document.querySelectorAll('.candidate-select');
+      for (const select of selects) {
+        const category = select.dataset.category;
+        if (!category) continue;
+
+        const { data, error } = await window.supabase
+          .from('votes')
+          .select('candidate_name')
+          .eq('category', category)
+          .order('candidate_name', { ascending: true });
+
+        if (error) {
+          console.error('Error loading candidate options for', category, error);
+          continue;
+        }
+
+        const dbNames = [...new Set((data || []).map(row => row.candidate_name).filter(Boolean))];
+        const defaultNames = defaultCandidates[category] || [];
+        const names = [...new Set([...defaultNames, ...dbNames])];
+
+        const options = ['<option value="">Select candidate</option>'];
+        names.forEach((name) => {
+          options.push(`<option value="${name}">${name}</option>`);
+        });
+
+        select.innerHTML = options.join('');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCandidateOptions);
+  </script>
+  <script>
+    // Payment redirect flow: save votes to localStorage then redirect to Selar product
+    document.getElementById('votingForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const fields = [
+        'tech-innovator',
+        'faculty-icon',
+        'sportsman',
+        'course-rep',
+        'best-dressed-male',
+        'best-dressed-female',
+        'most-influential',
+        'outstanding-executive',
+        'most-popular',
+        'programmer-of-the-year'
+      ];
+
+      const votes = [];
+
+      fields.forEach((field) => {
+        const candidateEl = document.querySelector(`[name="${field}"]`);
+        const amountEl = document.querySelector(`[name="${field}-amount"]`);
+        const candidate = candidateEl ? (candidateEl.value || '').trim() : '';
+        const amount = amountEl ? (parseInt(amountEl.value, 10) || 1) : 1;
+
+        if (candidate) {
+          votes.push({
+            category: field,
+            candidate_name: candidate,
+            vote_amount: amount
+          });
+        }
+      });
+
+      // Save pending votes locally and redirect to Selar
+      localStorage.setItem('pendingVotes', JSON.stringify(votes));
+
+      // Selar product link (provided)
+      window.location.href = 'https://selar.com/8709817974';
+    });
+  </script>
+
+</body>
+
+</html>
