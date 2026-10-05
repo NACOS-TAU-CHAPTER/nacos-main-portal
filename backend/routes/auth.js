@@ -1,8 +1,8 @@
 // routes/auth.js
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('../config/supabase');
-const { authenticate, requireAdmin } = require('../middleware/auth');
+const { supabase, createAuthClient } = require('../config/supabase');
+const { authenticate, requireAdmin, extractToken, invalidateAuthCache } = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimit');
 const { auditLog } = require('../middleware/audit');
 const { validateEmail, validatePassword, validateMatricNo } = require('../utils/validators');
@@ -67,12 +67,7 @@ const permanentlyDeleteAuthUser = async (userId) => {
       .rpc('auth_delete_user_permanent', { user_id: userId });
     if (!error) return;
     lastErr = error;
-  } catch (_) { /* rpc may not exist — ignore; fall through to SQL */ }
-  try {
-    const { error } = await supabase.from('users').delete().eq('id', userId);
-    if (!error) return;
-    lastErr = error;
-  } catch (_) { /* RLS may block this branch; expected sometimes */ }
+  } catch (_) { /* rpc may not exist — ignore */ }
   console.warn('[auth.js] permanentlyDeleteAuthUser: all branches failed for', userId, 'last error:', lastErr?.message || lastErr);
 };
 
@@ -156,46 +151,35 @@ router.post('/register', authLimiter, authValidationChains.register, validate, a
     }
 
     // ============================================================
-    // STEP 0 — Auth-users orphan cleanup (auto-heals failed
-    // previous signup attempts).
+    // STEP 0 — Safety checks before creating an Auth user.
     //
-    // Timeline context: the old auth.signUp() flow (and even our
-    // current admin.createUser + soft-delete rollback) leaves rows
-    // in auth.users with:
-    //   - email_confirmed_at = NULL  (signUp anti-enumeration path)
-    //   - OR deleted_at IS NOT NULL  (the default "soft" delete)
-    // Either state blocks admin.createUser with "A user with this
-    // email address has already been registered", but these rows
-    // are by default HIDDEN in the Dashboard Users view, so the
-    // operator believes no user exists.
-    //
-    // Rule: if we find an auth.users row for this email AND there
-    // is NO matching students.* profile row, we treat it as an
-    // orphan and PERMANENTLY purge it so the current, legitimate
-    // signup can succeed. If there IS a matching profile row, we
-    // return 409 as a normal duplicate.
+    // SECURITY (fixes admin takeover):
+    //  1. Public registration must never be able to claim an address on the
+    //     admin allow-list. Those accounts are provisioned out-of-band
+    //     (scripts/seed-admin.js), never through this endpoint.
+    //  2. We NEVER delete a pre-existing Auth user from this unauthenticated
+    //     endpoint. Previously an Auth user without a `students` row was treated
+    //     as an "orphan" and purged — which would also delete an admin account
+    //     (admins have no student profile) and let an attacker re-register the
+    //     address and inherit its privileges. Orphans must be cleaned up by an
+    //     operator, not by an anonymous request.
     // ============================================================
+    if (isAdminEmailAllowed(email)) {
+      console.warn('[register] blocked attempt to register a reserved admin email');
+      return errorResponse(res, 'This email address cannot be used for student registration.', 400);
+    }
+
     const preExistingAuthUser = await findAuthUserByEmail(email);
     if (preExistingAuthUser) {
-      const { data: profileForAuthUser } = await supabase
-        .from('students')
-        .select('user_id, email, status')
-        .or(`user_id.eq.${preExistingAuthUser.id},email.eq.${email.toLowerCase()}`)
-        .limit(1)
-        .maybeSingle();
-      if (profileForAuthUser) {
-        return errorResponse(
-          res,
-          'This email is already registered. Please login instead.',
-          409
-        );
-      }
       console.warn(
-        `[register] found orphan auth user ${preExistingAuthUser.id} ` +
-        `(${email}) with email_confirmed_at=${preExistingAuthUser.email_confirmed_at ?? 'NULL'} ` +
-        `deleted_at=${preExistingAuthUser.deleted_at ?? 'NULL'}. Purging permanently…`
+        `[register] Auth user ${preExistingAuthUser.id} already exists for this email without a student profile; ` +
+        'refusing to purge automatically. Operator cleanup required.'
       );
-      await permanentlyDeleteAuthUser(preExistingAuthUser.id);
+      return errorResponse(
+        res,
+        'This email is already registered. Please login or contact support.',
+        409
+      );
     }
 
     // ============================================================
@@ -223,10 +207,7 @@ router.post('/register', authLimiter, authValidationChains.register, validate, a
       });
       if (error) {
         console.error('[register] admin.createUser failed:', error);
-        const debugMsg = error?.message
-          ? `Registration failed: ${error.message}`
-          : 'Registration failed. Please try again.';
-        return errorResponse(res, debugMsg, 400, error);
+        return errorResponse(res, 'Registration failed. Please check your details and try again.', 400, error);
       }
       authData = data;
     }
@@ -258,7 +239,7 @@ router.post('/register', authLimiter, authValidationChains.register, validate, a
     // ============================================================
     let session = null;
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await createAuthClient().auth.signInWithPassword({
         email: email.toLowerCase().trim(),
         password: password
       });
@@ -354,7 +335,7 @@ router.post('/login', authLimiter, authValidationChains.login, validate, async (
     }
 
     // Attempt login with Supabase
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await createAuthClient().auth.signInWithPassword({
       email: email.toLowerCase().trim(),
       password: password
     });
@@ -396,16 +377,20 @@ router.post('/login', authLimiter, authValidationChains.login, validate, async (
     }
 
     // Log login activity
-    await supabase
-      .from('login_history')
-      .insert([{
-        user_id: data.user.id,
-        email: data.user.email,
-        ip_address: req.ip,
-        user_agent: req.headers['user-agent'],
-        login_time: new Date().toISOString()
-      }])
-      .catch(err => console.error('Login history error:', err));
+    try {
+      const { error: historyError } = await supabase
+        .from('login_history')
+        .insert([{
+          user_id: data.user.id,
+          email: data.user.email,
+          ip_address: req.ip,
+          user_agent: req.headers['user-agent'],
+          login_time: new Date().toISOString()
+        }]);
+      if (historyError) console.error('Login history error:', historyError.message);
+    } catch (historyErr) {
+      console.error('Login history error:', historyErr.message);
+    }
 
     // Get user role
     const { data: roleData } = await supabase
@@ -449,7 +434,7 @@ router.post('/admin/login', authLimiter, authValidationChains.adminLogin, valida
     }
 
     // Attempt login with Supabase
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await createAuthClient().auth.signInWithPassword({
       email: email.toLowerCase(),
       password: password
     });
@@ -533,7 +518,7 @@ router.post('/refresh', async (req, res) => {
     }
 
     // Refresh the session with Supabase
-    const { data, error } = await supabase.auth.refreshSession({
+    const { data, error } = await createAuthClient().auth.refreshSession({
       refresh_token: refreshToken
     });
 
@@ -627,8 +612,14 @@ router.post('/logout', authenticate, async (req, res) => {
       invalidateSession(req.userId);
     }
 
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    // Revoke the caller's own session (signOut() on the shared server client
+    // does not touch the caller's token).
+    const token = extractToken(req);
+    if (token) {
+      invalidateAuthCache(token);
+      const { error } = await supabase.auth.admin.signOut(token);
+      if (error) console.warn('[logout] admin.signOut failed:', error.message);
+    }
 
     return successResponse(res, null, 'Logged out successfully');
   } catch (error) {

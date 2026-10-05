@@ -4,7 +4,7 @@ const router = express.Router();
 const { supabase } = require('../config/supabase');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 const { auditLog } = require('../middleware/audit');
-const { successResponse, errorResponse } = require('../utils/helpers');
+const { successResponse, errorResponse, generateTransactionId } = require('../utils/helpers');
 
 // ============================================
 // SUBMIT PAYMENT (Student)
@@ -24,6 +24,33 @@ router.post('/submit', authenticate, async (req, res) => {
 
     if (!amount || !payment_type || !payment_proof_url) {
       return errorResponse(res, 'Amount, payment type, and proof are required', 400);
+    }
+
+    // Amount: finite, positive, sane upper bound, max 2 decimal places.
+    const parsedAmount = Number(amount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0 || parsedAmount > 10000000) {
+      return errorResponse(res, 'Amount must be a positive number.', 400);
+    }
+    if (Math.round(parsedAmount * 100) !== parsedAmount * 100 && Math.abs(Math.round(parsedAmount * 100) - parsedAmount * 100) > 1e-6) {
+      return errorResponse(res, 'Amount can have at most 2 decimal places.', 400);
+    }
+
+    // Proof URL: must be https and hosted on our Supabase project. This field is
+    // exempt from global HTML escaping, so it must be strictly validated here.
+    let proofUrl;
+    try {
+      proofUrl = new URL(String(payment_proof_url));
+    } catch {
+      return errorResponse(res, 'payment_proof_url must be a valid URL.', 400);
+    }
+    const allowedHost = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).host : null;
+    if (proofUrl.protocol !== 'https:' || (allowedHost && proofUrl.host !== allowedHost)) {
+      return errorResponse(res, 'Payment proof must be uploaded through the portal.', 400);
+    }
+
+    const cleanTransactionId = typeof transaction_id === 'string' ? transaction_id.trim().slice(0, 64) : '';
+    if (description !== undefined && description !== null && (typeof description !== 'string' || description.length > 500)) {
+      return errorResponse(res, 'Description must be text up to 500 characters.', 400);
     }
 
     if (!VALID_PAYMENT_TYPES.includes(payment_type)) {
@@ -55,9 +82,9 @@ router.post('/submit', authenticate, async (req, res) => {
       .from('payments')
       .insert([{
         user_id: req.userId,
-        amount: parseFloat(amount),
+        amount: parsedAmount,
         payment_type,
-        transaction_id: transaction_id || `NACOS-${Date.now()}`,
+        transaction_id: cleanTransactionId || generateTransactionId(),
         payment_proof_url,
         description,
         event_id: resolvedEventId,
@@ -122,12 +149,9 @@ router.get('/my', authenticate, async (req, res) => {
 // ============================================
 router.get('/', authenticate, requireAdmin, async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 20, 
-      status,
-      payment_type 
-    } = req.query;
+    const { status, payment_type } = req.query;
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
     const offset = (page - 1) * limit;
 
     let query = supabase
@@ -178,6 +202,25 @@ router.put('/:id/verify', authenticate, requireAdmin, async (req, res) => {
       return errorResponse(res, 'Invalid status. Use "verified" or "rejected".', 400);
     }
 
+    // State machine: only a pending payment can be decided, exactly once.
+    const { data: existing, error: existingErr } = await supabase
+      .from('payments')
+      .select('id, status, user_id')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (existingErr) throw existingErr;
+    if (!existing) {
+      return errorResponse(res, 'Payment record not found', 404);
+    }
+    if (existing.status !== 'pending') {
+      return errorResponse(res, `Payment has already been ${existing.status}.`, 409);
+    }
+    // Separation of duties: an admin cannot decide their own payment.
+    if (existing.user_id === req.userId) {
+      return errorResponse(res, 'You cannot verify or reject your own payment.', 403);
+    }
+
     const { data, error } = await supabase
       .from('payments')
       .update({
@@ -187,6 +230,7 @@ router.put('/:id/verify', authenticate, requireAdmin, async (req, res) => {
         notes: notes || null
       })
       .eq('id', id)
+      .eq('status', 'pending') // optimistic concurrency guard
       .select(`
         *,
         students:user_id (
@@ -210,7 +254,7 @@ router.put('/:id/verify', authenticate, requireAdmin, async (req, res) => {
       details: { 
         payment_id: id,
         amount: data.amount,
-        student: data.students.name,
+        student: data.students?.name || null,
         status: status,
         event_id: data.event_id || null
       },
@@ -287,39 +331,23 @@ router.put('/:id/verify', authenticate, requireAdmin, async (req, res) => {
 // ============================================
 router.get('/stats', authenticate, requireAdmin, async (req, res) => {
   try {
-    // Get total payments
-    const { data: totalData, error: totalError } = await supabase
-      .from('payments')
-      .select('amount', { count: 'exact' });
+    // Execute aggregation queries in parallel
+    const [
+      { data: totalData, count: totalCount, error: totalError },
+      { data: verifiedData, error: verifiedError },
+      { count: pendingCount, error: pendingError }
+    ] = await Promise.all([
+      supabase.from('payments').select('amount', { count: 'exact' }),
+      supabase.from('payments').select('amount').eq('status', 'verified'),
+      supabase.from('payments').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+    ]);
 
     if (totalError) throw totalError;
-
-    const totalAmount = totalData.reduce((sum, p) => sum + p.amount, 0);
-
-    // Get verified payments
-    const { data: verifiedData, error: verifiedError } = await supabase
-      .from('payments')
-      .select('amount')
-      .eq('status', 'verified');
-
     if (verifiedError) throw verifiedError;
-
-    const verifiedAmount = verifiedData.reduce((sum, p) => sum + p.amount, 0);
-
-    // Get pending count
-    const { count: pendingCount, error: pendingError } = await supabase
-      .from('payments')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'pending');
-
     if (pendingError) throw pendingError;
 
-    // Get total count
-    const { count: totalCount, error: countError } = await supabase
-      .from('payments')
-      .select('*', { count: 'exact', head: true });
-
-    if (countError) throw countError;
+    const totalAmount = (totalData || []).reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    const verifiedAmount = (verifiedData || []).reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 
     return successResponse(res, {
       total_payments: totalCount || 0,

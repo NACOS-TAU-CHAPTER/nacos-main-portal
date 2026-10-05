@@ -151,7 +151,7 @@ setTimeout(() => {
 **Check:**
 ```javascript
 // Manually test CSRF endpoint
-fetch('https://naco-tau-backend-production.up.railway.app/api/csrf-token', {
+fetch('https://nacos-tau-frontend.onrender.com/api/csrf-token', {
   credentials: 'include'
 })
 .then(r => r.json())

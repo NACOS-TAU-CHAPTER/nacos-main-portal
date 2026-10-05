@@ -10,7 +10,7 @@ Your **local backend server works fine**, but the **frontend can't connect** bec
 
 **Why Production Works:**
 - ✅ Railway provides automatic SSL certificates
-- ✅ Frontend correctly uses: `https://naco-tau-backend-production.up.railway.app`
+- ✅ Frontend correctly uses: `https://nacos-tau-frontend.onrender.com`
 
 ---
 
@@ -45,7 +45,7 @@ Your `api-config.js` already handles this correctly:
 ```javascript
 const API_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:5000/api'  // ✅ HTTP for local
-    : 'https://naco-tau-backend-production.up.railway.app/api'; // ✅ HTTPS for production
+    : 'https://nacos-tau-frontend.onrender.com/api'; // ✅ HTTPS for production
 ```
 
 #### Step 3: Test It
@@ -271,7 +271,7 @@ const API_URL = 'https://localhost:5000/api';
 // GOOD: Different protocols for different environments
 const API_URL = window.location.hostname === 'localhost' 
   ? 'http://localhost:5000/api'
-  : 'https://naco-tau-backend-production.up.railway.app/api';
+  : 'https://nacos-tau-frontend.onrender.com/api';
 ```
 
 ---

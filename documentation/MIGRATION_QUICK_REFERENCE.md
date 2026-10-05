@@ -173,7 +173,7 @@ fetch(window.API_URL + '/events/upcoming')
 ### Before Migration:
 ```
 Frontend:  https://nacos-tau-portal.netlify.app
-Backend:   https://naco-tau-backend-production.up.railway.app/api
+Backend:   https://nacos-tau-frontend.onrender.com/api
 ```
 
 ### After Migration:

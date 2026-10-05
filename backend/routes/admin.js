@@ -24,8 +24,9 @@ const { authenticate, requireAdmin } = require('../middleware/auth');
 // WHITELIST
 // ============================================
 
+// NOTE: 'audit_logs' is intentionally NOT writable here — the audit trail must
+// stay append-only and is written server-side only.
 const ALLOWED_ADMIN_TABLES = Object.freeze([
-  'audit_logs',
   'events',
   'past_questions',
   'timetables',
@@ -279,6 +280,13 @@ router.post('/:table/batch-update', validateBodyIsObject, async (req, res) => {
 });
 
 module.exports = router;
+
+/* ---------------------------------------------------------------------------
+ * DISABLED (dead code): unreachable because POST /:table above matches first.
+ * Kept only for reference. If email notifications are wanted, re-implement as
+ * dedicated routes mounted BEFORE '/:table', use req.userId (not
+ * req.user.userId), and send mail through a queue.
+ * ---------------------------------------------------------------------------
 // backend/routes/admin.js - Add this to your existing routes
 
 const { sendBulkEmail, getEmailTemplate } = require('../services/email');
@@ -430,4 +438,5 @@ router.post('/events', requireAdmin, async (req, res) => {
     }
 });
 // backend/routes/admin.js - Add this route
+*/
 

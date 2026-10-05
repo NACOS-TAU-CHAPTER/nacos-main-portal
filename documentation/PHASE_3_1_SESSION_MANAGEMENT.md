@@ -366,13 +366,13 @@ console.log('Refresh result:', result);
 ```bash
 # Check session status
 curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  https://naco-tau-backend-production.up.railway.app/api/auth/session-status
+  https://nacos-tau-frontend.onrender.com/api/auth/session-status
 
 # Refresh token
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"refreshToken":"YOUR_REFRESH_TOKEN"}' \
-  https://naco-tau-backend-production.up.railway.app/api/auth/refresh
+  https://nacos-tau-frontend.onrender.com/api/auth/refresh
 ```
 
 ---

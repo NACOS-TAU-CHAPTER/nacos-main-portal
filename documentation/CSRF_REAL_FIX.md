@@ -17,7 +17,7 @@ But backend still rejected it! Why? **Cross-origin cookie blocking!**
 
 Your setup:
 - **Frontend:** `https://nacos-tau-portal.netlify.app` (Netlify)  
-- **Backend:** `https://naco-tau-backend-production.up.railway.app` (Railway)
+- **Backend:** `https://nacos-tau-frontend.onrender.com` (Railway)
 
 These are **DIFFERENT DOMAINS** = cross-origin requests!
 

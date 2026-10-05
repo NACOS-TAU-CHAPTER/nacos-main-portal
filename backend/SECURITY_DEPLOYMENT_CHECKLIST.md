@@ -100,7 +100,7 @@ Open Railway logs and verify you see:
 ### 3. Test Health Endpoint
 
 ```bash
-curl https://naco-tau-backend-production.up.railway.app/api/health
+curl https://nacos-tau-frontend.onrender.com/api/health
 ```
 
 - [ ] Returns 200 OK
@@ -120,7 +120,7 @@ curl https://naco-tau-backend-production.up.railway.app/api/health
 ### 4. Test Security Headers
 
 ```bash
-curl -I https://naco-tau-backend-production.up.railway.app/api/health
+curl -I https://nacos-tau-frontend.onrender.com/api/health
 ```
 
 - [ ] `Strict-Transport-Security` header present
@@ -132,7 +132,7 @@ curl -I https://naco-tau-backend-production.up.railway.app/api/health
 
 ```bash
 # Send many requests (should get rate limited after 100)
-for i in {1..105}; do curl https://naco-tau-backend-production.up.railway.app/api/health; done
+for i in {1..105}; do curl https://nacos-tau-frontend.onrender.com/api/health; done
 ```
 
 - [ ] First 100 requests succeed

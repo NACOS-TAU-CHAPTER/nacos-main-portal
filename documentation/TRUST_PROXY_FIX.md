@@ -126,7 +126,7 @@ Result: Trust 2 proxies in chain
 ### Test Real IP Detection
 ```bash
 # Should return your real IP
-curl https://naco-tau-backend-production.up.railway.app/api/health
+curl https://nacos-tau-frontend.onrender.com/api/health
 
 # Check logs - should show your IP, not Railway's proxy IP
 ```
@@ -135,7 +135,7 @@ curl https://naco-tau-backend-production.up.railway.app/api/health
 ```bash
 # Make 101 requests quickly (limit is 100/15min)
 for i in {1..101}; do 
-  curl https://naco-tau-backend-production.up.railway.app/api/health
+  curl https://nacos-tau-frontend.onrender.com/api/health
 done
 
 # Request 101 should return 429 Too Many Requests
@@ -145,7 +145,7 @@ done
 ```bash
 # Try to spoof IP (should be ignored)
 curl -H "X-Forwarded-For: 1.2.3.4" \
-  https://naco-tau-backend-production.up.railway.app/api/health
+  https://nacos-tau-frontend.onrender.com/api/health
 
 # Your real IP should still be logged, not 1.2.3.4
 ```

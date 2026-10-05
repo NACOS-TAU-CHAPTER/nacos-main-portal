@@ -132,7 +132,7 @@ git push origin main
 
 #### Test 1: Health Check
 ```bash
-curl https://naco-tau-backend-production.up.railway.app/api/health
+curl https://nacos-tau-frontend.onrender.com/api/health
 ```
 
 **Expected**:
@@ -164,7 +164,7 @@ curl https://naco-tau-backend-production.up.railway.app/api/health
 
 #### Test 3: Security Headers
 ```bash
-curl -I https://naco-tau-backend-production.up.railway.app/api/health
+curl -I https://nacos-tau-frontend.onrender.com/api/health
 ```
 
 **Expected headers**:
@@ -260,7 +260,7 @@ curl -I http://naco-tau-backend-production.up.railway.app/api/health
 ### 2. Test Rate Limiting
 ```bash
 # Send 105 requests rapidly (should get rate limited)
-for i in {1..105}; do curl https://naco-tau-backend-production.up.railway.app/api/health; done
+for i in {1..105}; do curl https://nacos-tau-frontend.onrender.com/api/health; done
 ```
 
 **Expected**: After 100 requests, you'll get:
@@ -273,7 +273,7 @@ for i in {1..105}; do curl https://naco-tau-backend-production.up.railway.app/ap
 ### 3. Test CORS
 ```bash
 # From a browser console on a different domain:
-fetch('https://naco-tau-backend-production.up.railway.app/api/health')
+fetch('https://nacos-tau-frontend.onrender.com/api/health')
   .then(r => r.json())
   .then(console.log)
   .catch(console.error)
@@ -291,7 +291,7 @@ Try uploading a file with:
 
 ### 5. Test Honeypot
 ```bash
-curl -X POST https://naco-tau-backend-production.up.railway.app/api/admin/backup
+curl -X POST https://nacos-tau-frontend.onrender.com/api/admin/backup
 ```
 
 **Expected**: Fake success response, but logged as suspicious activity.

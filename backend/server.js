@@ -109,7 +109,7 @@ app.use(cors({
       callback(null, true);
     } else {
       logger.security.suspiciousActivity('CORS_BLOCKED', { origin });
-      callback(new Error(`Origin ${origin} not allowed by CORS policy`));
+      callback(null, false);
     }
   },
   credentials: true,
@@ -119,8 +119,8 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// Handle preflight requests explicitly for all routes
-app.options('*', cors());
+// Preflight (OPTIONS) is handled by the cors() middleware above using the allow-list.
+// (Do NOT add app.options('*', cors()) — it would answer preflights with a wildcard origin.)
 
 // Logging with Winston (replaces Morgan)
 app.use(morganLogger);
@@ -140,10 +140,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // fields to prevent stored XSS attacks (passwords/proofs/tokens are skipped internally)
 app.use(sanitizeRequestBody);
 logger.info('✅ XSS protection enabled (HTML entity escaping)');
-
-// Session tracking: monitor user sessions and detect expired/stale sessions
-app.use(trackSession);
-logger.info('✅ Session tracking enabled');
 
 // Sentry user context (attach user info to error reports)
 if (sentry.isEnabled) {
@@ -191,6 +187,12 @@ if (process.env.TRUST_PROXY) {
 
 app.use('/api/', globalLimiter);
 
+// Session tracking: monitor user sessions and detect expired/stale sessions.
+// Mounted AFTER the rate limiter on purpose: it makes an outbound Supabase call
+// per request and must not be reachable by unthrottled traffic.
+app.use(trackSession);
+logger.info('✅ Session tracking enabled');
+
 // ============================================
 // ROUTES
 // ============================================
@@ -221,6 +223,20 @@ if (process.env.ENABLE_CSRF === 'true') {
   logger.info('✅ CSRF protection enabled for state-changing routes');
 }
 
+// Honeypot endpoints (to detect/log automated scanners)
+// Mounted BEFORE router endpoints so unauthenticated probes trigger threat alerts
+const { createHoneypotUpload } = require('./middleware/uploadSecurity');
+app.post('/api/admin/backup', createHoneypotUpload());
+app.post('/api/upload/shell', createHoneypotUpload());
+app.get('/api/.env', (req, res) => {
+  logger.security.suspiciousActivity('HONEYPOT_ENV_ACCESS', {
+    ip: req.ip,
+    userAgent: req.get('user-agent')
+  });
+  res.status(404).json({ error: 'Not found' });
+});
+logger.info('✅ Honeypot endpoints configured for threat detection');
+
 // API Routes (no CSRF for read-only routes)
 app.use('/api/auth', authRoutes); // Auth has its own rate limiting
 app.use('/api/students', studentRoutes);
@@ -244,19 +260,6 @@ app.use('/api/admin', process.env.ENABLE_CSRF === 'true' ? csrfProtection : [], 
 // Audit logs route (admin only)
 const auditLogRoutes = require('./routes/auditLogs');
 app.use('/api/audit-logs', auditLogRoutes);
-
-// Honeypot endpoints (to detect/log automated scanners)
-const { createHoneypotUpload } = require('./middleware/uploadSecurity');
-app.post('/api/admin/backup', createHoneypotUpload());
-app.post('/api/upload/shell', createHoneypotUpload());
-app.get('/api/.env', (req, res) => {
-  logger.security.suspiciousActivity('HONEYPOT_ENV_ACCESS', {
-    ip: req.ip,
-    userAgent: req.get('user-agent')
-  });
-  res.status(404).json({ error: 'Not found' });
-});
-logger.info('✅ Honeypot endpoints configured for threat detection');
 
 // Serve root and fallback to index.html for frontend routes
 app.get('/', (req, res) => {
@@ -337,7 +340,7 @@ app.use((err, req, res, next) => {
 // ============================================
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info('='.repeat(60));
   logger.info('🚀 NACOS API Server Started Successfully');
   logger.info('='.repeat(60));
@@ -363,6 +366,37 @@ app.listen(PORT, () => {
   
   // Initialize session manager (starts background cleanup)
   initializeSessionManager();
+});
+
+// ============================================
+// GRACEFUL SHUTDOWN & PROCESS-LEVEL ERROR HANDLING
+// ============================================
+let shuttingDown = false;
+const shutdown = (signal, exitCode = 0) => {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  logger.info(`${signal} received: closing HTTP server...`);
+  server.close(() => {
+    logger.info('HTTP server closed. Exiting.');
+    process.exit(exitCode);
+  });
+  // Force-exit if connections don't drain in time.
+  setTimeout(() => {
+    logger.error('Forced shutdown after timeout');
+    process.exit(exitCode || 1);
+  }, 10000).unref();
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled promise rejection', { reason: reason && reason.stack ? reason.stack : String(reason) });
+  if (sentry.isEnabled) sentry.captureException(reason instanceof Error ? reason : new Error(String(reason)));
+});
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught exception', { error: err.message, stack: err.stack });
+  if (sentry.isEnabled) sentry.captureException(err);
+  shutdown('uncaughtException', 1);
 });
 
 module.exports = app; // For testing

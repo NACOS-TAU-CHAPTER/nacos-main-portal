@@ -56,7 +56,7 @@ git push origin main
 ### Verify Deployment:
 ```bash
 # Test health endpoint
-curl https://naco-tau-backend-production.up.railway.app/api/health
+curl https://nacos-tau-frontend.onrender.com/api/health
 
 # Should return:
 # {"status":"ok","timestamp":"...","security":{...}}
@@ -142,7 +142,7 @@ npm start
 
 ### After Backend Deployment (Railway):
 
-- [ ] **Health Check**: `curl https://naco-tau-backend-production.up.railway.app/api/health`
+- [ ] **Health Check**: `curl https://nacos-tau-frontend.onrender.com/api/health`
 - [ ] **Directory Endpoint**: Test `/api/students/directory` returns `current_level` field
 - [ ] **Profile Update**: Login and update profile (should not get validation error)
 - [ ] **Level Filter**: Test filtering by level (100, 200, 300, 400) works correctly

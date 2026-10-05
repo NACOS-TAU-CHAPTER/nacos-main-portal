@@ -208,7 +208,7 @@ After 1-2 weeks of stable operation:
 
 ```
 Frontend:  https://nacos-tau-portal.netlify.app
-Backend:   https://naco-tau-backend-production.up.railway.app
+Backend:   https://nacos-tau-frontend.onrender.com
 Database:  https://pnusmlckowqagnlzjqbv.supabase.co (unchanged)
 ```
 
@@ -296,7 +296,7 @@ Find your API config file (likely `frontend/assets/js/api-config.js`):
 
 ```javascript
 // OLD
-const API_URL = 'https://naco-tau-backend-production.up.railway.app/api';
+const API_URL = 'https://nacos-tau-frontend.onrender.com/api';
 
 // NEW
 const API_URL = 'https://nacos-backend.onrender.com/api';
@@ -573,7 +573,7 @@ After successful migration:
 curl -I https://nacos-tau-portal.netlify.app
 
 # Test Railway backend
-curl https://naco-tau-backend-production.up.railway.app/api/health
+curl https://nacos-tau-frontend.onrender.com/api/health
 
 # Test Vercel frontend (after migration)
 curl -I https://your-project.vercel.app

@@ -72,7 +72,7 @@ const storage = multer.memoryStorage();
 // File filter
 const fileFilter = (req, file, cb) => {
     const allowedTypes = {
-        'image': ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
+        'image': ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
         'document': ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'],
         'presentation': ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'],
         'spreadsheet': ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'],
@@ -219,7 +219,7 @@ const uploadSingle = (fieldName) => {
     return (req, res, next) => {
         upload.single(fieldName)(req, res, (err) => {
             if (err instanceof multer.MulterError) {
-                if (err.code === 'FILE_TOO_LARGE') {
+                if (err.code === 'LIMIT_FILE_SIZE') {
                     return res.status(413).json({
                         error: 'File too large. Maximum size is 10MB.'
                     });
@@ -242,7 +242,7 @@ const uploadMultiple = (fieldName, maxCount = 5) => {
     return (req, res, next) => {
         upload.array(fieldName, maxCount)(req, res, (err) => {
             if (err instanceof multer.MulterError) {
-                if (err.code === 'FILE_TOO_LARGE') {
+                if (err.code === 'LIMIT_FILE_SIZE') {
                     return res.status(413).json({
                         error: 'File too large. Maximum size is 10MB.'
                     });

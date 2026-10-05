@@ -28,18 +28,40 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
     }
 });
 
-// Public client (uses anon key for public operations)
-const supabasePublic = createClient(supabaseUrl, supabaseAnonKey || supabaseServiceKey, {
-    auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-        detectSessionInUrl: false
+// Anon-key client factory.
+// SECURITY: user-facing auth calls (signInWithPassword, refreshSession, ...) mutate
+// the client's in-memory session, and supabase-js then sends that user's JWT on
+// every later request made through the same client. They must therefore NEVER run
+// on the shared service_role client above. Create a fresh, throwaway client per call.
+const createAuthClient = () => {
+    if (!supabaseAnonKey) {
+        // Never fall back to the service_role key for end-user auth flows.
+        throw new Error('Missing SUPABASE_ANON_KEY (required for user authentication)');
     }
-});
+    return createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+            detectSessionInUrl: false
+        }
+    });
+};
+
+// Shared anon client for stateless public reads only (do not sign users in with it).
+const supabasePublic = supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+            detectSessionInUrl: false
+        }
+    })
+    : null;
 
 console.log('✅ Supabase clients initialized');
 
 module.exports = {
     supabase,
-    supabasePublic
+    supabasePublic,
+    createAuthClient
 };

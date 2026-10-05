@@ -188,13 +188,13 @@ GLOBAL_RATE_LIMIT=100
 
 ```bash
 # Health check
-curl https://naco-tau-backend-production.up.railway.app/api/health
+curl https://nacos-tau-frontend.onrender.com/api/health
 
 # Check security headers
-curl -I https://naco-tau-backend-production.up.railway.app/api/health
+curl -I https://nacos-tau-frontend.onrender.com/api/health
 
 # Test rate limiting (send 105 requests)
-for i in {1..105}; do curl https://naco-tau-backend-production.up.railway.app/api/health; done
+for i in {1..105}; do curl https://nacos-tau-frontend.onrender.com/api/health; done
 ```
 
 ---

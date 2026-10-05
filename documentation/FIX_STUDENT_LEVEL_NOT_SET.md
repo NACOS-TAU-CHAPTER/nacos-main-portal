@@ -33,7 +33,7 @@ const API_URL = window.location.hostname === 'localhost'
 // AFTER (✅ Correct):
 const API_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:5000/api'
-    : 'https://naco-tau-backend-production.up.railway.app/api';  // New URL
+    : 'https://nacos-tau-frontend.onrender.com/api';  // New URL
 ```
 
 ## Verification
@@ -57,7 +57,7 @@ supabase.from('students').select('*')
 ### After Fix:
 ```javascript
 // API call succeeds:
-fetch('https://naco-tau-backend-production.up.railway.app/api/students')
+fetch('https://nacos-tau-frontend.onrender.com/api/students')
 
 // Backend queries: students_with_current_level view
 // Result:
@@ -117,7 +117,7 @@ Frontend Admin Dashboard
     ↓
 api.students.list() in api-config.js
     ↓
-GET https://naco-tau-backend-production.up.railway.app/api/students
+GET https://nacos-tau-frontend.onrender.com/api/students
     ↓
 backend/routes/students.js
     ↓

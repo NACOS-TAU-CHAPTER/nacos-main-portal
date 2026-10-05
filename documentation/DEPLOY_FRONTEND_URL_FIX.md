@@ -4,7 +4,7 @@
 
 ✅ **Updated:** `frontend/assets/js/env.js`
 - **Old URL:** `https://nacos-backend.up.railway.app/api`
-- **New URL:** `https://naco-tau-backend-production.up.railway.app/api`
+- **New URL:** `https://nacos-tau-frontend.onrender.com/api`
 
 ## Step 1: Test Railway Backend (IMPORTANT)
 
@@ -15,7 +15,7 @@ Before deploying, verify the Railway backend is responding:
 test-new-railway-url.bat
 
 # OR manually test
-curl https://naco-tau-backend-production.up.railway.app/api/health
+curl https://nacos-tau-frontend.onrender.com/api/health
 ```
 
 **Expected response:**
@@ -95,7 +95,7 @@ In browser console (on Netlify site):
 ```javascript
 // Check current API URL
 console.log('API URL:', window.API_URL);
-// Should show: https://naco-tau-backend-production.up.railway.app/api
+// Should show: https://nacos-tau-frontend.onrender.com/api
 
 // Test connection
 fetch(window.API_URL + '/events/upcoming')
@@ -140,7 +140,7 @@ fetch(window.API_URL + '/events/upcoming')
 **Cause:** Railway backend is down or not responding
 
 **Solution:**
-1. Test backend directly: `curl https://naco-tau-backend-production.up.railway.app/api/health`
+1. Test backend directly: `curl https://nacos-tau-frontend.onrender.com/api/health`
 2. If fails, go to Railway dashboard
 3. Click "Restart" or "Redeploy"
 4. Wait 1-2 minutes
@@ -236,7 +236,7 @@ Implement Paystack payment system (plan already created in `PAYMENT_INTEGRATION_
 
 ```bash
 # Test Railway backend
-curl https://naco-tau-backend-production.up.railway.app/api/health
+curl https://nacos-tau-frontend.onrender.com/api/health
 
 # Commit and push
 git add frontend/assets/js/env.js

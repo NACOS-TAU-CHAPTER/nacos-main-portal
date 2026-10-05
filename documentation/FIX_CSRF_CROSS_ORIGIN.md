@@ -17,7 +17,7 @@ But the backend **still rejected it** with "Invalid CSRF token"!
 
 Your setup:
 - **Frontend:** `https://nacos-tau-portal.netlify.app` (Netlify)
-- **Backend:** `https://naco-tau-backend-production.up.railway.app` (Railway)
+- **Backend:** `https://nacos-tau-frontend.onrender.com` (Railway)
 
 These are **different domains** = cross-origin requests!
 
@@ -94,7 +94,7 @@ const csrfProtection = csrf({
 
 ```http
 Request from: https://nacos-tau-portal.netlify.app
-To: https://naco-tau-backend-production.up.railway.app
+To: https://nacos-tau-frontend.onrender.com
 
 DELETE /api/admin/past_questions/xxx
 Headers:
@@ -116,7 +116,7 @@ Error: Invalid CSRF token
 
 ```http
 Request from: https://nacos-tau-portal.netlify.app
-To: https://naco-tau-backend-production.up.railway.app
+To: https://nacos-tau-frontend.onrender.com
 
 DELETE /api/admin/past_questions/xxx
 Headers:

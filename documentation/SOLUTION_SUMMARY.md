@@ -126,7 +126,7 @@ Browser: https://nacos-tau-portal.netlify.app
   ↓
 Frontend detects: hostname !== 'localhost'
   ↓
-Frontend uses: https://naco-tau-backend-production.up.railway.app/api ✅
+Frontend uses: https://nacos-tau-frontend.onrender.com/api ✅
   ↓
 Railway provides: Valid SSL certificate ✅
   ↓

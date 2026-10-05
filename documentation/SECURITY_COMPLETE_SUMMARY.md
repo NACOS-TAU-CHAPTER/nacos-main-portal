@@ -355,7 +355,7 @@ LOG_TO_FILE=true
 
 ### Health Check
 ```bash
-curl https://naco-tau-backend-production.up.railway.app/api/health
+curl https://nacos-tau-frontend.onrender.com/api/health
 ```
 
 ### Security Status

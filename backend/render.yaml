@@ -59,9 +59,14 @@ services:
       - key: GLOBAL_RATE_LIMIT
         value: 100
       
-      # Optional: Sentry error tracking
-      # - key: SENTRY_DSN
-      #   sync: false  # Set in dashboard if using Sentry
+      # Admin allow-list (comma-separated). Without this the code falls back to a
+      # hardcoded default address.
+      - key: ADMIN_EMAILS
+        sync: false  # Set in dashboard
+
+      # Error tracking
+      - key: SENTRY_DSN
+        sync: false  # Set in dashboard
 
 # Notes:
 # 1. Variables with sync: false MUST be set manually in Render dashboard

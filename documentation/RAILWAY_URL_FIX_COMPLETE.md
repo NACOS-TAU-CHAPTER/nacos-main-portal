@@ -4,7 +4,7 @@
 
 Updated Railway backend URL from:
 - ❌ **Old**: `https://nacos-backend.up.railway.app`
-- ✅ **New**: `https://naco-tau-backend-production.up.railway.app`
+- ✅ **New**: `https://nacos-tau-frontend.onrender.com`
 
 ## Files Updated
 
@@ -47,7 +47,7 @@ Open: https://nacos-tau-portal.netlify.app
 ```javascript
 // Should show NEW URL
 console.log(window.API_URL);
-// Expected: https://naco-tau-backend-production.up.railway.app/api
+// Expected: https://nacos-tau-frontend.onrender.com/api
 ```
 
 ### Step 3: Test API Connection
@@ -98,7 +98,7 @@ fetch(window.API_URL + '/events/upcoming')
 
 1. **Railway backend down**:
    ```bash
-   curl https://naco-tau-backend-production.up.railway.app/api/health
+   curl https://nacos-tau-frontend.onrender.com/api/health
    # Should return: {"status":"healthy",...}
    ```
 
@@ -128,7 +128,7 @@ fetch(window.API_URL + '/events/upcoming')
 ```javascript
 // 1. Check API URL
 console.log('API URL:', window.API_URL);
-// Expected: https://naco-tau-backend-production.up.railway.app/api
+// Expected: https://nacos-tau-frontend.onrender.com/api
 
 // 2. Test backend connection
 fetch(window.API_URL + '/health')
@@ -184,8 +184,8 @@ Check these regularly:
 Keep these handy:
 
 - **Frontend**: https://nacos-tau-portal.netlify.app
-- **Backend**: https://naco-tau-backend-production.up.railway.app
-- **Backend Health**: https://naco-tau-backend-production.up.railway.app/api/health
+- **Backend**: https://nacos-tau-frontend.onrender.com
+- **Backend Health**: https://nacos-tau-frontend.onrender.com/api/health
 - **Netlify Dashboard**: https://app.netlify.com
 - **Railway Dashboard**: https://railway.app/dashboard
 - **Frontend GitHub**: https://github.com/Darth-vader1/nacos-tau-frontend

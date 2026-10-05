@@ -71,10 +71,10 @@ Open browser console on https://nacos-tau-portal.netlify.app and run:
 // Check what URL the site is using
 console.log('API URL:', window.API_URL);
 
-// Should show: https://naco-tau-backend-production.up.railway.app/api
+// Should show: https://nacos-tau-frontend.onrender.com/api
 ```
 
-**Expected**: `https://naco-tau-backend-production.up.railway.app/api`
+**Expected**: `https://nacos-tau-frontend.onrender.com/api`
 **If you see**: `https://nacos-backend.up.railway.app/api` → Cache issue (see Step 3)
 
 ### Step 3: Clear Browser Cache
@@ -195,7 +195,7 @@ pause
 
 2. **Is Railway backend responding?**
    ```bash
-   curl https://naco-tau-backend-production.up.railway.app/api/health
+   curl https://nacos-tau-frontend.onrender.com/api/health
    # Should return: {"status":"healthy",...}
    ```
 

@@ -54,7 +54,7 @@ git push origin main
 3. Refresh the page
 4. Look for this request:
    ```
-   GET https://naco-tau-backend-production.up.railway.app/api/students?status=active&page=1&limit=500
+   GET https://nacos-tau-frontend.onrender.com/api/students?status=active&page=1&limit=500
    ```
 5. **Expected**: Status 200 ✅
 6. **Bad**: Status 404 or CORS error ❌
@@ -112,7 +112,7 @@ console.log(window.api);
 #### Check 3: Is Backend Running?
 Test the API directly:
 ```bash
-curl https://naco-tau-backend-production.up.railway.app/api/students
+curl https://nacos-tau-frontend.onrender.com/api/students
 ```
 
 Expected: JSON response (may need auth header)
