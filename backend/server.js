@@ -87,6 +87,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5000',
   'http://127.0.0.1:5500',
+  'http://127.0.0.1:5504',
+  'http://localhost:5504',
   'http://127.0.0.1:8080',
 ];
 
@@ -95,8 +97,8 @@ if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);
 }
 
-// Remove localhost origins in production
-const productionOrigins = process.env.NODE_ENV === 'production' 
+// Remove localhost origins in production unless ALLOW_LOCAL_CORS is true
+const productionOrigins = (process.env.NODE_ENV === 'production' && process.env.ALLOW_LOCAL_CORS !== 'true')
   ? allowedOrigins.filter(origin => !origin.includes('localhost') && !origin.includes('127.0.0.1'))
   : allowedOrigins;
 
@@ -166,10 +168,10 @@ const { extractToken } = require('./middleware/auth');
 const crypto = require('crypto');
 
 // Redis for persistent rate limiting across deployments
-const Redis = require('ioredis');
-// For rate-limit-redis v3+, we usually need .default
+let Redis;
 let RedisStore;
 try {
+  Redis = require('ioredis');
   const rlr = require('rate-limit-redis');
   RedisStore = rlr.default || rlr;
 } catch (e) {
@@ -386,7 +388,7 @@ const server = app.listen(PORT, () => {
   logger.info(`   - CSRF Protection: ${process.env.ENABLE_CSRF === 'true' ? 'ENABLED' : 'DISABLED'}`);
   logger.info(`   - Sentry Monitoring: ${sentry.isEnabled ? 'ENABLED' : 'DISABLED'}`);
   logger.info(`   - Structured Logging: ENABLED`);
-  logger.info(`   - Rate Limiting: ENABLED`);
+  logger.info(`   - Rate Limiting: ENABLED (${redisStore ? 'Upstash Redis' : 'Memory'} store)`);
   logger.info(`   - XSS Protection: ENABLED`);
   logger.info(`   - Session Management: ENABLED`);
   logger.info(`   - CORS: ENABLED (${productionOrigins.length} origins)`);
