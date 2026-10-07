@@ -19,6 +19,7 @@ const router = express.Router();
 const { validationResult } = require('express-validator');
 const { supabase } = require('../config/supabase');
 const { authenticate, requireAdmin } = require('../middleware/auth');
+const { triggerAutoContentBroadcast } = require('../services/email');
 
 // ============================================
 // WHITELIST
@@ -35,7 +36,9 @@ const ALLOWED_ADMIN_TABLES = Object.freeze([
   'payment_verification',
   'hackathons',
   'hackathon_registrations',
-  'hackathon_submissions'
+  'hackathon_submissions',
+  'past_executives',
+  'executives'
 ]);
 
 const TABLE_NAME_RE = /^[a-z][a-z0-9_]{0,62}$/;
@@ -148,11 +151,29 @@ router.post('/:table', validateBodyIsObject, async (req, res) => {
     const shapeErr = validatePayloadShape(req.body);
     if (shapeErr) return res.status(400).json({ error: shapeErr });
 
-    const { data, error } = await supabase
+    let insertBody = { ...req.body };
+    let { data, error } = await supabase
       .from(req.adminTable)
-      .insert(req.body)
+      .insert(insertBody)
       .select()
       .maybeSingle();
+
+    // Graceful recovery for missing columns (e.g. PGRST204: Could not find the 'level_or_set' column)
+    if (error && (error.code === 'PGRST204' || String(error.message || '').includes('schema cache'))) {
+      const match = String(error.message || '').match(/Could not find the '([^']+)' column/i);
+      if (match && match[1] && Object.prototype.hasOwnProperty.call(insertBody, match[1])) {
+        const missingCol = match[1];
+        console.warn(`[admin/POST ${req.adminTable}] Column '${missingCol}' not found in DB schema. Retrying insert without it...`);
+        delete insertBody[missingCol];
+        const retry = await supabase
+          .from(req.adminTable)
+          .insert(insertBody)
+          .select()
+          .maybeSingle();
+        data = retry.data;
+        error = retry.error;
+      }
+    }
 
     if (error) {
       console.error(`[admin/POST ${req.adminTable}] error:`, error);
@@ -160,6 +181,12 @@ router.post('/:table', validateBodyIsObject, async (req, res) => {
         error: `Insert into ${req.adminTable} failed: ${sanitizeDbErr(error)}`
       });
     }
+
+    // Automatically broadcast notification email to all active students
+    if (data) {
+      triggerAutoContentBroadcast(req.adminTable, data);
+    }
+
     return res.json({ success: true, data: data || null, count: data ? 1 : 0 });
   } catch (err) {
     console.error(`[admin/POST ${req.adminTable}] exception:`, err);
@@ -184,12 +211,31 @@ router.put('/:table/:id', validateBodyIsObject, async (req, res) => {
       return res.status(400).json({ error: 'Update body is empty; nothing to patch.' });
     }
 
-    const { data, error } = await supabase
+    let updateBody = { ...req.body };
+    let { data, error } = await supabase
       .from(req.adminTable)
-      .update(req.body)
+      .update(updateBody)
       .eq('id', req.adminId)
       .select()
       .maybeSingle();
+
+    // Graceful recovery for missing columns (e.g. PGRST204)
+    if (error && (error.code === 'PGRST204' || String(error.message || '').includes('schema cache'))) {
+      const match = String(error.message || '').match(/Could not find the '([^']+)' column/i);
+      if (match && match[1] && Object.prototype.hasOwnProperty.call(updateBody, match[1])) {
+        const missingCol = match[1];
+        console.warn(`[admin/PUT ${req.adminTable}/${req.adminId}] Column '${missingCol}' not found in DB schema. Retrying update without it...`);
+        delete updateBody[missingCol];
+        const retry = await supabase
+          .from(req.adminTable)
+          .update(updateBody)
+          .eq('id', req.adminId)
+          .select()
+          .maybeSingle();
+        data = retry.data;
+        error = retry.error;
+      }
+    }
 
     if (error) {
       console.error(`[admin/PUT ${req.adminTable}/${req.adminId}] error:`, error);
