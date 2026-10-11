@@ -1,0 +1,38 @@
+{
+  "name": "nacos-tau-portal",
+  "version": "2.0.0",
+  "description": "NACOS Thomas Adewumi University Chapter Full-Stack Portal",
+  "private": true,
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "seed": "node backend/scripts/seed-admin.js"
+  },
+  "dependencies": {
+    "@sentry/node": "^7.120.4",
+    "@sentry/profiling-node": "^7.120.4",
+    "@supabase/supabase-js": "^2.110.8",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "express-rate-limit": "^7.5.1",
+    "express-validator": "^7.3.2",
+    "file-type": "^16.5.4",
+    "helmet": "^8.0.0",
+    "ioredis": "^5.3.0",
+    "morgan": "^1.11.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^10.0.15",
+    "rate-limit-redis": "^4.0.0",
+    "resend": "^6.18.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
