@@ -20,6 +20,14 @@
       "destination": "/frontend/dashboard-assets/$1"
     },
     {
+      "source": "/receipt/(.*)",
+      "destination": "/frontend/receipt.html"
+    },
+    {
+      "source": "/receipt",
+      "destination": "/frontend/receipt.html"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/frontend/$1"
     }
