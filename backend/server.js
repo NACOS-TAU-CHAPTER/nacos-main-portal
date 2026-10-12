@@ -67,19 +67,9 @@ if (sentry.isEnabled) {
 // SECURITY & MIDDLEWARE
 // ============================================
 
-// HTTPS redirect (production only)
-app.use(httpsRedirect);
-logger.info('✅ HTTPS enforcement enabled (production only)');
-
-// Enhanced Helmet for security headers (CSP, HSTS, etc.)
-app.use(helmetConfig);
-logger.info('✅ Security headers configured (Helmet + CSP + HSTS)');
-
-// Additional custom security headers
-app.use(additionalSecurityHeaders);
-
-// CORS configuration
+// CORS configuration (MUST be first before redirects & security headers so preflights succeed)
 const allowedOrigins = [
+  'https://nacosportal.vercel.app',
   'https://nacos-tau-portal.netlify.app',
   'https://nacos-tau-chapter.netlify.app', // Legacy URL (if still in use)
   'http://localhost:5000',  // Backend serving frontend
@@ -93,9 +83,14 @@ const allowedOrigins = [
   'http://127.0.0.1:8080',
 ];
 
-// Add custom FRONTEND_URL from env if provided
+// Add custom FRONTEND_URL from env if provided (supports comma-separated list)
 if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
+  const frontendUrls = process.env.FRONTEND_URL.split(',').map(url => url.trim());
+  frontendUrls.forEach(url => {
+    if (url && !allowedOrigins.includes(url)) {
+      allowedOrigins.push(url);
+    }
+  });
 }
 
 // Remove localhost origins in production unless ALLOW_LOCAL_CORS is true
@@ -103,32 +98,50 @@ const productionOrigins = (process.env.NODE_ENV === 'production' && process.env.
   ? allowedOrigins.filter(origin => !origin.includes('localhost') && !origin.includes('127.0.0.1'))
   : allowedOrigins;
 
-app.use(cors({
+// Log allowed origins for debugging
+logger.info(`🔗 CORS allowed origins: ${productionOrigins.join(', ')}`);
+
+const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, Postman, or same-origin)
     if (!origin) return callback(null, true);
     
-    // Check if origin is in allowed list or any Vercel preview/production deployment
+    // Check if origin is in allowed list or any Vercel/Cloudflare deployment
     if (
       productionOrigins.includes(origin) ||
       origin.endsWith('.vercel.app') ||
+      origin.endsWith('.pages.dev') || // Cloudflare Pages
       origin === 'https://nacosportal.vercel.app'
     ) {
       callback(null, true);
     } else {
+      logger.warn(`⚠️ CORS blocked origin: ${origin}`);
       logger.security.suspiciousActivity('CORS_BLOCKED', { origin });
-      callback(null, false);
+      // Return error instead of false for better debugging
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token', 'Accept', 'Origin'],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  optionsSuccessStatus: 200
-}));
+  optionsSuccessStatus: 200,
+  preflightContinue: false
+};
 
-// Preflight (OPTIONS) is handled by the cors() middleware above using the allow-list.
-// (Do NOT add app.options('*', cors()) — it would answer preflights with a wildcard origin.)
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+// HTTPS redirect (production only)
+app.use(httpsRedirect);
+logger.info('✅ HTTPS enforcement enabled (production only)');
+
+// Enhanced Helmet for security headers (CSP, HSTS, etc.)
+app.use(helmetConfig);
+logger.info('✅ Security headers configured (Helmet + CSP + HSTS)');
+
+// Additional custom security headers
+app.use(additionalSecurityHeaders);
 
 // Logging with Winston (replaces Morgan)
 app.use(morganLogger);
