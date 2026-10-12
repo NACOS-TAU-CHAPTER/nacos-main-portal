@@ -1,43 +1,36 @@
 {
   "version": 2,
-  "name": "nacos-backend",
-  "builds": [
+  "rewrites": [
     {
-      "src": "server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    },
     {
-      "src": "/(.*)",
-      "dest": "/server.js"
+      "source": "/(.*)",
+      "destination": "/api/index.js"
     }
   ],
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
           "value": "https://nacosportal.vercel.app"
         },
         {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
         },
         {
           "key": "Access-Control-Allow-Headers",
           "value": "Content-Type, Authorization, X-Requested-With, X-CSRF-Token, Accept, Origin"
         },
         {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "true"
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
         }
       ]
     }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "FRONTEND_URL": "https://nacosportal.vercel.app"
-  }
+  ]
 }

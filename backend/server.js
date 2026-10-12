@@ -117,8 +117,7 @@ const corsOptions = {
     } else {
       logger.warn(`⚠️ CORS blocked origin: ${origin}`);
       logger.security.suspiciousActivity('CORS_BLOCKED', { origin });
-      // Return error instead of false for better debugging
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
   credentials: true,
@@ -248,17 +247,8 @@ if (process.env.TRUST_PROXY) {
 
 app.use('/api/', globalLimiter);
 
-// Session tracking: monitor user sessions and detect expired/stale sessions.
-// Mounted AFTER the rate limiter on purpose: it makes an outbound Supabase call
-// per request and must not be reachable by unthrottled traffic.
-app.use(trackSession);
-logger.info('✅ Session tracking enabled');
-
-// ============================================
-// ROUTES
-// ============================================
-
-// Health check (no auth, no CSRF)
+// Health check (no auth, no CSRF, no session tracking — must be before trackSession)
+// Placed here so it is not affected by the Supabase-dependent session middleware.
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
@@ -271,6 +261,17 @@ app.get('/api/health', (req, res) => {
     }
   });
 });
+
+// Session tracking: monitor user sessions and detect expired/stale sessions.
+// Mounted AFTER the rate limiter on purpose: it makes an outbound Supabase call
+// per request and must not be reachable by unthrottled traffic.
+// Health check is excluded (defined above).
+app.use(trackSession);
+logger.info('✅ Session tracking enabled');
+
+// ============================================
+// ROUTES
+// ============================================
 
 // CSRF token endpoint (must be called before any CSRF-protected requests)
 // Frontend should fetch this token and include it in subsequent requests
