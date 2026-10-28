@@ -180,6 +180,7 @@ router.get('/directory', authenticate, directoryLimiter, async (req, res) => {
       department,
       skills,
       interests,
+      current_level,
       year,
       sort = 'name-asc'
     } = req.query;
@@ -315,22 +316,45 @@ router.put('/:id/verify', authenticate, requireAdmin, idParam('id'), validate, a
 
     const newStatus = action === 'approve' ? 'active' : 'rejected';
 
-    const { data, error } = await supabase
+    let updatePayload = {
+      status: newStatus,
+      verified_at: new Date().toISOString(),
+      verified_by: req.userId
+    };
+
+    let { data, error } = await supabase
       .from('students')
-      .update({
-        status: newStatus,
-        verified_at: new Date().toISOString(),
-        verified_by: req.userId
-      })
+      .update(updatePayload)
       .eq('id', id)
       .select()
       .single();
+
+    if (error && (error.code === '42703' || String(error.message || '').toLowerCase().includes('column'))) {
+      // If verified_at or verified_by column doesn't exist, fall back to updating status only
+      const fallback = await supabase
+        .from('students')
+        .update({ status: newStatus })
+        .eq('id', id)
+        .select()
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (error) {
       if (error.code === 'PGRST116') {
         return errorResponse(res, 'Student not found', 404);
       }
       throw error;
+    }
+
+    // If approving, also ensure auth user is confirmed so they can log in
+    if (newStatus === 'active' && data.user_id) {
+      try {
+        await supabase.auth.admin.updateUserById(data.user_id, { email_confirm: true });
+      } catch (authErr) {
+        console.warn('[verify] could not confirm auth user:', authErr?.message || authErr);
+      }
     }
 
     // Log verification
@@ -427,7 +451,14 @@ router.get('/me', authenticate, async (req, res) => {
       throw error;
     }
 
-    return successResponse(res, data, 'Profile retrieved successfully');
+    const levelInfo = calculateStudentLevel(data);
+    const enrichedData = {
+      ...data,
+      current_level: data.current_level || levelInfo.current_level,
+      is_graduated: data.is_graduated !== undefined ? data.is_graduated : levelInfo.is_graduated
+    };
+
+    return successResponse(res, enrichedData, 'Profile retrieved successfully');
   } catch (error) {
     console.error('Profile fetch error:', error);
     return errorResponse(res, 'Failed to load profile', 500, error);
@@ -454,6 +485,7 @@ router.put('/me', authenticate, profileUpdateLimiter, studentValidationChains.up
       snapchat,
       portfolio_url,
       interests,
+      current_level,
       year_of_study,
       graduation_year,
       visibility,
@@ -479,8 +511,16 @@ router.put('/me', authenticate, profileUpdateLimiter, studentValidationChains.up
     if (snapchat !== undefined) updates.snapchat = snapchat;
     if (portfolio_url !== undefined) updates.portfolio_url = portfolio_url;
     if (interests !== undefined) updates.interests = sanitizeArray(interests);
-    if (year_of_study !== undefined) updates.year_of_study = year_of_study;
-    if (graduation_year !== undefined) updates.graduation_year = graduation_year;
+    if (current_level) {
+      const lvl = parseInt(current_level, 10);
+      const now = new Date();
+      const currentAcadYear = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+      const calculatedYearOfStudy = currentAcadYear + 1 - (lvl / 100);
+      updates.year_of_study = calculatedYearOfStudy;
+    } else if (year_of_study !== undefined) {
+      updates.year_of_study = year_of_study;
+    }
+    if (graduation_year !== undefined) updates.graduation_year = graduation_year ? parseInt(graduation_year, 10) : null;
     if (visibility !== undefined) updates.visibility = visibility;
     if (privacy_settings !== undefined) updates.privacy_settings = privacy_settings;
     
@@ -501,7 +541,14 @@ router.put('/me', authenticate, profileUpdateLimiter, studentValidationChains.up
       return errorResponse(res, 'Student profile not found. Please contact support.', 404);
     }
 
-    return successResponse(res, { student: data }, 'Profile updated successfully');
+    const levelInfo = calculateStudentLevel(data);
+    const enrichedStudent = {
+      ...data,
+      current_level: data.current_level || levelInfo.current_level,
+      is_graduated: data.is_graduated !== undefined ? data.is_graduated : levelInfo.is_graduated
+    };
+
+    return successResponse(res, { student: enrichedStudent }, 'Profile updated successfully');
 
   } catch (error) {
     console.error('Profile update error:', error);
