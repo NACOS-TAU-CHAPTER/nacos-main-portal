@@ -2,6 +2,12 @@
   "version": 2,
   "name": "nacos-portal",
   "cleanUrls": true,
+  "crons": [
+    {
+      "path": "/api/students/profile-reminders/cron",
+      "schedule": "0 15 * * 1,3,5"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
