@@ -47,3 +47,4 @@ logs/
 next-app/
 .kiro/
 *.kiroenv
+powershell.cmd
