@@ -173,7 +173,8 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
       event_type,
       requires_payment,
       payment_amount,
-      max_attendees
+      max_attendees,
+      send_email
     } = req.body;
 
     if (!title || !date) {
@@ -208,8 +209,11 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
       if (syncId) await syncAttendeeCount(syncId);
     }
 
-    if (data) {
+    const shouldSendEmail = send_email !== false && send_email !== 'false';
+    if (data && shouldSendEmail) {
       triggerAutoContentBroadcast('events', data);
+    } else if (data && !shouldSendEmail) {
+      console.log('[events/POST] Skipped email broadcast because send_email is false');
     }
 
     return successResponse(res, { event: data }, 'Event created successfully', 201);
