@@ -376,6 +376,9 @@
       <p class="page-subtitle">Browse through all previous NACOS events and activities</p>
     </div>
 
+    <!-- Champions Podium (auto-shown when any event has announced winners) -->
+    <div id="recentWinnersPodiumSection" class="mb-4" style="display: none;"></div>
+
     <!-- Filters Section -->
     <div class="filters-section">
       <div class="row g-3">
@@ -547,6 +550,21 @@
           map[w.event_id].push(w);
         });
         winnersByEvent = map;
+        const podiumHost = document.getElementById('recentWinnersPodiumSection');
+        if (podiumHost && typeof window.buildWinnersPodiumHtml === 'function') {
+          const eventIds = Object.keys(map);
+          if (eventIds.length > 0) {
+            podiumHost.innerHTML = eventIds.map(evId => {
+              const rows = map[evId];
+              const evTitle = rows[0]?.event_title || 'Event Champions';
+              return window.buildWinnersPodiumHtml(rows, {
+                title: `${evTitle} — Champions Podium`,
+                uid: `page-${evId}`
+              });
+            }).join('');
+            podiumHost.style.display = 'block';
+          }
+        }
       } catch (_) {}
     }
 

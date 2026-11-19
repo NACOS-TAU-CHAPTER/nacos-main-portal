@@ -573,7 +573,14 @@ router.get('/winners/recent', async (req, res) => {
     }
 
     const enriched = await enrichWinnersWithGames(data || []);
-    return successResponse(res, { winners: enriched }, 'Event winners retrieved');
+    const eventIds = [...new Set(enriched.map(w => w.event_id).filter(Boolean))];
+    const evTitleMap = {};
+    if (eventIds.length > 0) {
+      const { data: evs } = await supabase.from('events').select('id, title').in('id', eventIds);
+      (evs || []).forEach(e => { evTitleMap[e.id] = e.title; });
+    }
+    const withTitles = enriched.map(w => ({ ...w, event_title: evTitleMap[w.event_id] || null }));
+    return successResponse(res, { winners: withTitles }, 'Event winners retrieved');
   } catch (error) {
     console.error('Recent winners fetch error:', error);
     return errorResponse(res, 'Failed to fetch event winners', 500, error);
@@ -617,7 +624,14 @@ router.get('/:id/winners', async (req, res) => {
     }
 
     const enriched = await enrichWinnersWithGames(data || []);
-    return successResponse(res, { winners: enriched }, 'Event winners retrieved');
+    const eventIds = [...new Set(enriched.map(w => w.event_id).filter(Boolean))];
+    const evTitleMap = {};
+    if (eventIds.length > 0) {
+      const { data: evs } = await supabase.from('events').select('id, title').in('id', eventIds);
+      (evs || []).forEach(e => { evTitleMap[e.id] = e.title; });
+    }
+    const withTitles = enriched.map(w => ({ ...w, event_title: evTitleMap[w.event_id] || null }));
+    return successResponse(res, { winners: withTitles }, 'Event winners retrieved');
   } catch (error) {
     console.error('Event winners fetch error:', error);
     return errorResponse(res, 'Failed to fetch event winners', 500, error);

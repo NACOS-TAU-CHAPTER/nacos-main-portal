@@ -193,6 +193,8 @@
           </button>
         </div>
 
+        <div id="liveWinnersPodiumSection" class="mb-4" style="display: none;"></div>
+
         <div class="row g-4" id="eventsContainer" data-aos="fade-up">
           <div class="col-12 text-center">
             <p class="text-muted">Loading events...</p>
@@ -575,6 +577,29 @@
         .order('date', { ascending: true });
 
       const container = document.getElementById('eventsContainer');
+      (async () => {
+        try {
+          const apiBase = (window.__CONFIG?.apiUrl || (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://naco-tau-backend.vercel.app/api')).replace(/\/$/, '');
+          const wResp = await fetch(`${apiBase}/events/winners/recent`);
+          if (wResp.ok) {
+            const wJson = await wResp.json();
+            const list = Array.isArray(wJson?.data?.winners) ? wJson.data.winners : [];
+            const slot = document.getElementById('liveWinnersPodiumSection');
+            if (slot && list.length > 0 && typeof window.buildWinnersPodiumHtml === 'function') {
+              const byEvent = {};
+              list.forEach(w => { (byEvent[w.event_id] = byEvent[w.event_id] || []).push(w); });
+              slot.innerHTML = Object.keys(byEvent).map(evId => {
+                const rows = byEvent[evId];
+                return window.buildWinnersPodiumHtml(rows, {
+                  title: `${rows[0]?.event_title || 'Event'} — Champions Podium`,
+                  uid: `page-live-${evId}`
+                });
+              }).join('');
+              slot.style.display = 'block';
+            }
+          }
+        } catch (_) {}
+      })();
 
       if (error || !data || data.length === 0) {
         container.innerHTML = `
