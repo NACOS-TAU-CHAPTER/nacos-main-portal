@@ -2682,7 +2682,7 @@
   <script src="assets/js/env.js"></script>
   <script src="assets/js/security.js"></script> 
   <script type="module" src="assets/js/supabase-config.js"></script>
-  <script type="module" src="assets/js/api-config.js?v=2.3"></script>
+  <script type="module" src="assets/js/api-config.js?v=2.5"></script>
   <script type="module" src="assets/js/admin-homepage-cms.js"></script>
   <script type="module" src="assets/js/admin-event-winners.js"></script>
   <script src="assets/js/main.js"></script>
@@ -2691,12 +2691,40 @@
 
   <script type="module">
     import { supabase, requireAdmin, checkAuth, signOut, DEFAULT_BUCKET_NAME, ensureBucket, uploadFileToStorage } from './assets/js/supabase-config.js';
-    import { api } from './assets/js/api-config.js?v=2.3';
+    import { api } from './assets/js/api-config.js?v=2.5';
 
     // Convenience: also expose on window for code paths that reference
     // window.api (delete event handlers registered via onclick="..." etc
     // run in the outer scope, not inside this ES module).
     window.api = api;
+
+    // Ensure api.payments.manualReserve / recheckPending exist even if an older api-config.js is cached
+    if (window.api && window.api.payments) {
+      const postPaymentsFallback = async (path, body) => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return { success: false, error: 'Not authenticated' };
+        const base = window.API_URL || (window.__CONFIG && window.__CONFIG.apiUrl) || 'https://naco-tau-backend.vercel.app/api';
+        const url = `${base}${path}`;
+        const opts = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify(body || {})
+        };
+        const resp = (window.securityManager && window.securityManager.isInitialized)
+          ? await window.securityManager.secureFetch(url, opts)
+          : await fetch(url, opts);
+        return resp.json();
+      };
+      if (!window.api.payments.manualReserve) {
+        window.api.payments.manualReserve = (data) => postPaymentsFallback('/payments/manual-reserve', data);
+      }
+      if (!window.api.payments.recheckPending) {
+        window.api.payments.recheckPending = (includeAbandoned = false) => postPaymentsFallback('/payments/recheck-pending', { includeAbandoned });
+      }
+    }
 
     // Ensure api.students.verify is always defined even if an older api-config.js is cached
     if (window.api && window.api.students && !window.api.students.verify) {
