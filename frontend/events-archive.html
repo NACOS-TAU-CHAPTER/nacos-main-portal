@@ -503,6 +503,7 @@
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/env.js"></script>
   <script src="assets/js/security.js"></script>
+  <script src="assets/js/winners-podium.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="module">
     import { supabase } from './assets/js/supabase-config.js';
@@ -532,6 +533,22 @@
       type: ''
     };
     let searchDebounceTimer = null;
+    let winnersByEvent = {};
+
+    async function loadRecentEventWinners() {
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/events/winners/recent`);
+        if (!resp.ok) return;
+        const json = await resp.json();
+        const list = Array.isArray(json?.data?.winners) ? json.data.winners : [];
+        const map = {};
+        list.forEach(w => {
+          if (!map[w.event_id]) map[w.event_id] = [];
+          map[w.event_id].push(w);
+        });
+        winnersByEvent = map;
+      } catch (_) {}
+    }
 
     // ================================================================
     // DOM Elements
@@ -652,6 +669,8 @@
         const desc = event.description ? escapeHtml(event.description) : 'No description available';
         const location = event.location ? escapeHtml(event.location) : '';
         const type = event.event_type ? escapeHtml(event.event_type) : 'General';
+        const winCount = (winnersByEvent[event.id] || []).length;
+        const winBadge = winCount ? `<span class="badge bg-warning text-dark ms-1"><i class="bi bi-trophy-fill me-1"></i>${winCount} Winner${winCount > 1 ? 's' : ''}</span>` : '';
 
         return `
           <div class="col-md-6 col-lg-4">
@@ -674,7 +693,7 @@
                     <i class="bi bi-geo-alt"></i> ${location}
                   </p>
                 ` : ''}
-                <span class="event-type-badge">${type}</span>
+                <span class="event-type-badge">${type}</span>${winBadge}
               </div>
             </div>
           </div>
@@ -798,6 +817,21 @@
         const description = event.description || 'No description available';
         const type = event.event_type || 'General';
 
+        let winnersHtml = '';
+        try {
+          const wResp = await fetch(`${API_BASE_URL}/api/events/${encodeURIComponent(eventId)}/winners`);
+          if (wResp.ok) {
+            const wJson = await wResp.json();
+            const wList = Array.isArray(wJson?.data?.winners) ? wJson.data.winners : [];
+            if (wList.length > 0 && typeof window.buildWinnersPodiumHtml === 'function') {
+              winnersHtml = window.buildWinnersPodiumHtml(wList, {
+                title: `${event.title || 'Event'} — Champions Podium`,
+                uid: `archive-${eventId}`
+              });
+            }
+          }
+        } catch (_) {}
+
         modalContent.innerHTML = `
           ${safeImage ? `
             <img src="${escapeHtml(safeImage)}" alt="${escapeHtml(event.title)}" 
@@ -834,6 +868,7 @@
             </div>
           ` : ''}
 
+          ${winnersHtml}
           <div class="text-muted small mt-3">
             <p><em>This event has already taken place.</em></p>
           </div>
@@ -952,7 +987,7 @@
     // ================================================================
     // Initialize
     // ================================================================
-    loadPastEvents();
+    loadRecentEventWinners().then(loadPastEvents);
 
   </script>
 </body>

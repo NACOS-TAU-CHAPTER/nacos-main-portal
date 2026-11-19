@@ -447,7 +447,7 @@ router.post('/bachs-session', authenticate, async (req, res) => {
     if (phoneCheck.error) return errorResponse(res, phoneCheck.error, 400);
     const entryCheck = parseEntryUsernames(req.body, game);
     if (entryCheck.error) return errorResponse(res, entryCheck.error, 400);
-    const tourErr = await tournamentError(game, { userId: req.userId });
+    const tourErr = await tournamentError(game, { userId: req.userId, resolvePending: (p) => resolvePendingTournamentPayment(p, payable.event) });
     if (tourErr) return errorResponse(res, tourErr, 409);
     // Save the number on the student's profile if they don't have one yet.
     supabase.from('students').update({ phone: phoneCheck.phone })
@@ -1343,6 +1343,36 @@ const publicEventSummary = (ev) => ev ? {
  *
  * Returns { ok: true, settled, ticketNumber, newlyIssued } or { ok: false, status, error }.
  */
+/**
+ * When a player retries a tournament checkout while an earlier pending
+ * checkout still exists, ask Bachs first:
+ *  - If Bachs says it was PAID, settle it and issue their ticket ("paid").
+ *  - If Bachs says it is unpaid/open/expired, mark it abandoned ("abandoned")
+ *    so the player can start a fresh checkout immediately without waiting.
+ *  - If Bachs cannot be reached (5xx) or it is a manual proof, hold ("hold").
+ */
+async function resolvePendingTournamentPayment(payment, event) {
+  if (!payment || !payment.transaction_id || !isOnlineCheckoutRow(payment)) return "hold";
+  try {
+    const outcome = await confirmOnlineOrder({ payment, event, source: "tournament retry check" });
+    if (outcome.ok) return "paid";
+    if (outcome.status >= 500) return "hold";
+    // Gateway confirmed this earlier checkout is not paid — retire it so the player can retry immediately.
+    await supabase
+      .from('payments')
+      .update({
+        status: 'abandoned',
+        notes: `${payment.notes || ''} [replaced on retry]`.trim()
+      })
+      .eq('id', payment.id)
+      .eq('status', 'pending');
+    return "abandoned";
+  } catch (err) {
+    console.warn('[tournament retry check] could not verify pending order:', err?.message || err);
+    return "hold";
+  }
+}
+
 async function confirmOnlineOrder({ payment, event, source }) {
   const quantity = quantityOf(payment);
   let settled = payment;
@@ -1695,7 +1725,7 @@ router.post('/guest-session', guestLimiter, async (req, res) => {
     if (capErr) return errorResponse(res, capErr, 409);
     const entryCheck = parseEntryUsernames(req.body, game);
     if (entryCheck.error) return errorResponse(res, entryCheck.error, 400);
-    const tourErr = await tournamentError(game, { guestEmail: guest.email });
+    const tourErr = await tournamentError(game, { guestEmail: guest.email, resolvePending: (p) => resolvePendingTournamentPayment(p, payable.event) });
     if (tourErr) return errorResponse(res, tourErr, 409);
 
     const unitPrice = payable.price;
@@ -2659,16 +2689,87 @@ const cronOrAdmin = (req, res, next) => {
 };
 const runAbandonCleanup = async (req, res) => {
   try {
+    const recheck = await recheckPendingOnlinePayments({ limit: 50 });
     const result = await markAbandonedCheckouts();
-    if (result.marked) {
+    if (result.marked || recheck.verified) {
       await auditLog({ action: 'checkouts_marked_abandoned', userId: req.userId || null, details: { ...result, via: req.viaCron ? 'cron' : 'admin' }, ip: req.ip });
     }
-    return successResponse(res, result, `${result.marked} unpaid checkout(s) marked abandoned`);
+    return successResponse(res, { ...result, recheck }, `${recheck.verified} paid checkout(s) verified, ${result.marked} unpaid checkout(s) marked abandoned`);
   } catch (error) {
     console.error('[checkouts] cleanup error:', error);
     return errorResponse(res, 'Could not clean up abandoned checkouts', 500, error);
   }
 };
+async function recheckPendingOnlinePayments({ limit = 30, includeRecentAbandoned = false } = {}) {
+  const statuses = includeRecentAbandoned ? ['pending', 'abandoned'] : ['pending'];
+  const { data: rows, error } = await supabase
+    .from('payments')
+    .select('*')
+    .in('status', statuses)
+    .ilike('notes', '%[online-checkout]%')
+    .not('transaction_id', 'is', null)
+    .not('event_id', 'is', null)
+    .order('submitted_at', { ascending: false })
+    .limit(Math.min(50, Math.max(1, parseInt(limit, 10) || 30)));
+  if (error) throw error;
+
+  const list = rows || [];
+  if (!list.length) return { checked: 0, verified: 0, stillUnpaid: 0, errors: 0 };
+
+  const eventIds = [...new Set(list.map(r => r.event_id).filter(Boolean))];
+  const { data: evRows, error: evErr } = await supabase.from('events').select('*').in('id', eventIds);
+  if (evErr) throw evErr;
+  const evById = Object.fromEntries((evRows || []).map(e => [e.id, e]));
+
+  let verified = 0;
+  let stillUnpaid = 0;
+  let errors = 0;
+
+  for (let i = 0; i < list.length; i += 5) {
+    const batch = list.slice(i, i + 5);
+    const settled = await Promise.allSettled(batch.map(async (payment) => {
+      const event = evById[payment.event_id];
+      if (!event) return { status: 'error' };
+      const outcome = await confirmOnlineOrder({ payment, event, source: 'bulk re-check' });
+      if (outcome.ok) return { status: 'verified' };
+      if (outcome.status >= 500) return { status: 'error' };
+      return { status: 'unpaid' };
+    }));
+    settled.forEach(r => {
+      if (r.status !== 'fulfilled') { errors++; return; }
+      if (r.value.status === 'verified') verified++;
+      else if (r.value.status === 'unpaid') stillUnpaid++;
+      else errors++;
+    });
+  }
+
+  return { checked: list.length, verified, stillUnpaid, errors };
+}
+
+const runBulkRecheck = async (req, res) => {
+  try {
+    const includeAbandoned = req.query?.includeAbandoned === 'true' || req.body?.includeAbandoned === true;
+    const result = await recheckPendingOnlinePayments({ limit: 40, includeRecentAbandoned: includeAbandoned });
+    if (result.verified > 0) {
+      await auditLog({
+        action: 'payments_bulk_gateway_rechecked',
+        userId: req.userId || null,
+        details: { ...result, via: req.viaCron ? 'cron' : 'admin' },
+        ip: req.ip
+      });
+    }
+    return successResponse(
+      res,
+      result,
+      `Checked ${result.checked} pending checkout(s): ${result.verified} verified, ${result.stillUnpaid} still unpaid.`
+    );
+  } catch (error) {
+    console.error('[payments] bulk re-check error:', error);
+    return errorResponse(res, 'Could not re-check pending payments', 500, error);
+  }
+};
+router.get('/recheck-pending', cronOrAdmin, runBulkRecheck);
+router.post('/recheck-pending', cronOrAdmin, runBulkRecheck);
 router.get('/cleanup-abandoned', cronOrAdmin, runAbandonCleanup);
 router.post('/cleanup-abandoned', cronOrAdmin, runAbandonCleanup);
 
