@@ -49,6 +49,9 @@ function renderWinnersList() {
       ? '<span class="badge bg-success">Announced</span>'
       : '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning">Draft</span>';
 
+    const prizeText = w.prize
+      ? (window.NacosFormat?.prizePool ? window.NacosFormat.prizePool(w.prize) : w.prize)
+      : '';
     return `
       <tr>
         <td>${gameLabel}</td>
@@ -59,7 +62,7 @@ function renderWinnersList() {
           ${w.winner_email ? `<div class="small text-muted">${esc(w.winner_email)}</div>` : ''}
         </td>
         <td>
-          ${w.prize ? `<span class="badge bg-warning text-dark">${esc(w.prize)}</span>` : '<span class="text-muted">—</span>'}
+          ${prizeText ? `<span class="badge bg-warning text-dark">${esc(prizeText)}</span>` : '<span class="text-muted">—</span>'}
           <div class="mt-1">${statusBadge}</div>
         </td>
         <td class="text-end">
@@ -172,6 +175,15 @@ window.deleteEventWinner = async function(winnerId) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Auto-format prize input (e.g. "10000" -> "₦10,000", "10k" -> "₦10,000") on blur
+  const prizeInput = document.getElementById('ew-prize');
+  prizeInput?.addEventListener('blur', () => {
+    const raw = prizeInput.value.trim();
+    if (raw && window.NacosFormat?.prizePool) {
+      prizeInput.value = window.NacosFormat.prizePool(raw);
+    }
+  });
+
   // Re-filter registered players when Game / Category changes
   document.getElementById('ew-game-select')?.addEventListener('change', (e) => {
     renderPlayerSelect(e.target.value);
@@ -213,7 +225,11 @@ document.addEventListener('DOMContentLoaded', () => {
         in_game_username: document.getElementById('ew-gamertag').value.trim() || null,
         winner_email: document.getElementById('ew-winner-email').value.trim() || null,
         placement: document.getElementById('ew-placement').value.trim() || '1st Place',
-        prize: document.getElementById('ew-prize').value.trim() || null,
+        prize: (() => {
+          const raw = document.getElementById('ew-prize').value.trim();
+          if (!raw) return null;
+          return window.NacosFormat?.prizePool ? window.NacosFormat.prizePool(raw) : raw;
+        })(),
         note: document.getElementById('ew-note').value.trim() || null
       };
 

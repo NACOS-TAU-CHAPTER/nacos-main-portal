@@ -219,6 +219,16 @@
     return 0;
   }
 
+  function formatPrize(raw) {
+    if (!raw) return '';
+    if (window.NacosFormat?.prizePool) return window.NacosFormat.prizePool(raw);
+    const s = String(raw).trim();
+    if (/^\d+(?:\.\d+)?$/.test(s)) {
+      return '₦' + Number(s).toLocaleString('en-NG', { maximumFractionDigits: 2 });
+    }
+    return s;
+  }
+
   function renderGroupStage(list) {
     const slots = { 1: null, 2: null, 3: null };
     const extras = [];
@@ -251,7 +261,7 @@
               <div class="nacos-podium-trophy"><i class="bi ${iconClass}"></i></div>
               <div class="nacos-podium-name">${esc(w.winner_name)}</div>
               ${w.in_game_username ? `<div class="nacos-podium-tag">@${esc(w.in_game_username)}</div>` : ''}
-              ${w.prize ? `<span class="nacos-podium-prize">${esc(w.prize)}</span>` : ''}
+              ${w.prize ? `<span class="nacos-podium-prize">${esc(formatPrize(w.prize))}</span>` : ''}
             </div>
             <div class="nacos-podium-block">
               <span class="nacos-podium-num">${num}</span>
@@ -265,7 +275,7 @@
       ? `<div class="nacos-podium-extras">${extras.map(w => `
           <span class="nacos-podium-extra-pill">
             <strong class="text-warning">${esc(w.placement)}:</strong>
-            ${esc(w.winner_name)}${w.in_game_username ? ` (@${esc(w.in_game_username)})` : ''}${w.prize ? ` — ${esc(w.prize)}` : ''}
+            ${esc(w.winner_name)}${w.in_game_username ? ` (@${esc(w.in_game_username)})` : ''}${w.prize ? ` — ${esc(formatPrize(w.prize))}` : ''}
           </span>
         `).join('')}</div>`
       : '';

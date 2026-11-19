@@ -1559,7 +1559,7 @@ async function sendEventWinnersEmail({ event, winners = [], recipients = null, b
         const rowsHtml = winners.map(w => {
             const gameName = w.game_name ? `<span style="color:#157a09;font-weight:600;">${escEmail(w.game_name)}</span>` : 'Overall';
             const tag = w.in_game_username ? ` <span style="color:#64748b;font-size:12px;">(@${escEmail(w.in_game_username)})</span>` : '';
-            const prize = w.prize ? `<span class="badge badge-prize">${escEmail(w.prize)}</span>` : '—';
+            const prize = w.prize ? `<span class="badge badge-prize">${escEmail(formatPrizeText(w.prize))}</span>` : '—';
             return `
                 <tr>
                     <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:13px;">${gameName}</td>
@@ -1645,7 +1645,7 @@ async function sendEventWinnerCongratsEmail({ event, winner }) {
                 { label: 'Event', value: `<strong>${escEmail(eventTitle)}</strong>` },
                 ...(winner.game_name ? [{ label: 'Game / Category', value: `<strong>${escEmail(winner.game_name)}</strong>` }] : []),
                 { label: 'Placement', value: `<strong style="color:#b45309;">${escEmail(winner.placement || '1st Place')}</strong>` },
-                ...(winner.prize ? [{ label: 'Prize', value: `<span class="badge badge-prize">${escEmail(winner.prize)}</span>` }] : []),
+                ...(winner.prize ? [{ label: 'Prize', value: `<span class="badge badge-prize">${escEmail(formatPrizeText(winner.prize))}</span>` }] : []),
                 ...(winner.note ? [{ label: 'Note', value: escEmail(winner.note) }] : [])
             ],
             buttonText: 'View Events Archive',

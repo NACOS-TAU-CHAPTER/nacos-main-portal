@@ -8,6 +8,7 @@ const { successResponse, errorResponse } = require('../utils/helpers');
 const { triggerAutoContentBroadcast, sendEventWinnersEmail, sendEventWinnerCongratsEmail } = require('../services/email');
 const { auditLog } = require('../middleware/audit');
 const { isUuid, loadEventItems, parseItemsInput } = require('../utils/games');
+const { formatPrizePool } = require('../utils/prizeFormat');
 
 // ============================================
 // GET UPCOMING EVENTS
@@ -685,7 +686,7 @@ router.post('/:id/winners', authenticate, requireAdmin, async (req, res) => {
       in_game_username: resolvedGamertag,
       winner_email: resolvedEmail,
       placement: (placement && String(placement).trim()) || '1st Place',
-      prize: prize ? String(prize).trim() : null,
+      prize: prize ? formatPrizePool(String(prize).trim()) : null,
       note: note ? String(note).trim() : null,
       created_by: req.userId || null
     };
