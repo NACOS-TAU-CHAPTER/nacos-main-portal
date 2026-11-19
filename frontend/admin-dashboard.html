@@ -23,6 +23,8 @@
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/aos/aos.css" rel="stylesheet">
   <link href="assets/css/main.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <!-- SweetAlert2 primary CDN + 2-level fallback (cdnjs mirror → alert/confirm shim).
          Admin panels depend heavily on Swal.fire; this guarantees the UI never breaks
@@ -275,20 +277,28 @@
       z-index: 3;
     }
 
-    /* Ensure long tables can scroll horizontally on small viewports */
+    /* Ensure long tables scroll smoothly horizontally on small viewports without crushing columns */
+    .table thead th {
+      white-space: nowrap;
+      word-break: normal;
+    }
     @media (max-width: 768px) {
       .table-responsive {
         overflow-x: auto;
       }
-      /* Give tables a sensible minimum width so columns don't collapse
-         — wide tables will scroll horizontally while preserving layout */
       .table-responsive table {
-        min-width: 720px;
+        min-width: 780px;
       }
-      /* Allow text to wrap in table cells (except actions) to avoid overflow */
-      .table td, .table th {
+      #events-section .table-responsive table {
+        min-width: 960px;
+      }
+      .table td {
         white-space: normal;
-        word-break: break-word;
+        word-break: normal;
+        overflow-wrap: break-word;
+      }
+      .table td .badge, .table td .btn {
+        white-space: nowrap;
       }
       /* Keep the Actions column compact and prevent wrapping */
       .table td:last-child, .table th:last-child {
@@ -653,7 +663,7 @@
                   </tr>
                 </thead>
                 <tbody id="questions-table-body">
-                  <tr><td colspan="6" class="text-center text-muted py-4 loading-pulse">Loading...</td</tr>
+                  <tr><td colspan="7" class="text-center text-muted py-4 loading-pulse">Loading...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1842,21 +1852,67 @@
 
   <!-- Event Attendees Modal -->
   <div class="modal fade" id="eventAttendeesModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
           <div>
             <h5 class="modal-title mb-0" id="eventAttendeesModalTitle"><i class="bi bi-people-fill me-2 text-primary"></i>Event Attendees</h5>
             <small class="text-muted" id="eventAttendeesModalSubtitle">Registered &amp; Paid Students</small>
           </div>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-danger btn-sm" id="exportAttendeesPdfHeaderBtn" onclick="exportEventAttendeesPdf()" title="Download filtered or full attendee list as PDF">
+              <i class="bi bi-file-earmark-pdf-fill me-1"></i>Export as PDF
+            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+        </div>
+        <!-- Search & Filter Toolbar -->
+        <div class="px-3 py-2 bg-light border-bottom">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="attSearchInput" placeholder="Search name, email, phone, username, matric, ref..." oninput="filterAndRenderEventAttendees()">
+                <button class="btn btn-outline-secondary" type="button" id="attSearchClearBtn" style="display:none;" onclick="document.getElementById('attSearchInput').value=''; filterAndRenderEventAttendees();" title="Clear search"><i class="bi bi-x"></i></button>
+              </div>
+            </div>
+            <div class="col-6 col-md-2">
+              <select class="form-select form-select-sm" id="attTypeFilter" onchange="filterAndRenderEventAttendees()" aria-label="Filter by attendee type">
+                <option value="">All Attendees</option>
+                <option value="student">Students Only</option>
+                <option value="guest">Guests Only</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-3" id="attGameFilterWrap">
+              <select class="form-select form-select-sm" id="attGameFilter" onchange="filterAndRenderEventAttendees()" aria-label="Filter by game or activity">
+                <option value="">All Games / Activities</option>
+              </select>
+            </div>
+            <div class="col-8 col-md-2">
+              <select class="form-select form-select-sm" id="attStatusFilter" onchange="filterAndRenderEventAttendees()" aria-label="Filter by payment status">
+                <option value="">All Statuses</option>
+                <option value="online_paid">Paid (Online)</option>
+                <option value="offline_paid">Paid (Offline / Cash)</option>
+                <option value="complimentary">Reserved (Complimentary)</option>
+                <option value="free">Free Registration</option>
+              </select>
+            </div>
+            <div class="col-4 col-md-1 text-end">
+              <button type="button" class="btn btn-outline-secondary btn-sm w-100" onclick="resetEventAttendeesFilters()" title="Reset filters">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-1 px-1">
+            <small class="text-muted" id="attFilterResultsInfo"></small>
+          </div>
         </div>
         <div class="modal-body p-0">
           <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
               <thead class="table-light">
                 <tr>
-                  <th>Student</th>
+                  <th>Student / Attendee</th>
                   <th>Matric No</th>
                   <th>Department</th>
                   <th>Fee / Status</th>
@@ -1869,10 +1925,15 @@
             </table>
           </div>
         </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-success btn-sm" id="reserveSpotFromModalBtn">
-            <i class="bi bi-ticket-perforated me-1"></i>Reserve Spot / Issue Ticket
-          </button>
+        <div class="modal-footer justify-content-between flex-wrap gap-2">
+          <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-success btn-sm" id="reserveSpotFromModalBtn">
+              <i class="bi bi-ticket-perforated me-1"></i>Reserve Spot / Issue Ticket
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="exportEventAttendeesPdf()">
+              <i class="bi bi-file-earmark-pdf-fill me-1"></i>Export as PDF
+            </button>
+          </div>
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
@@ -2880,6 +2941,11 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
     }
 
     const apiAdmin = {
+      list: (table, params = {}) => {
+        const qs = new URLSearchParams(params).toString();
+        return apiAdminRequest('GET', `/${table}${qs ? '?' + qs : ''}`);
+      },
+      get: (table, id) => apiAdminRequest('GET', `/${table}/${encodeURIComponent(id)}`),
       create: (table, body) => apiAdminRequest('POST', `/${table}`, body),
       update: (table, id, body) => apiAdminRequest('PUT', `/${table}/${encodeURIComponent(id)}`, body),
       remove: (table, id) => apiAdminRequest('DELETE', `/${table}/${encodeURIComponent(id)}`),
@@ -3080,14 +3146,16 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
 
       tbody.innerHTML = filtered.map(ev => `
         <tr>
-          <td>
-            ${ev.image_url ? `<img src="${escapeHtml(ev.image_url)}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;" class="me-2">` : ''}
-            <strong>${escapeHtml(ev.title)}</strong>
+          <td style="min-width: 185px;">
+            <div class="d-flex align-items-center gap-2">
+              ${ev.image_url ? `<img src="${escapeHtml(ev.image_url)}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">` : ''}
+              <strong>${escapeHtml(ev.title)}</strong>
+            </div>
           </td>
-          <td>${ev.date || 'TBD'}</td>
-          <td>${ev.requires_payment ? `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning">${formatCurrency(ev.payment_amount)}</span>` : '<span class="badge bg-success">Free</span>'}</td>
-          <td><button class="btn btn-sm btn-outline-success py-0 px-2" style="font-size:12px;font-weight:600;" onclick="viewEventAttendees('${ev.id}')" title="Click to view attending / paid students"><i class="bi bi-people me-1"></i>${(window.eventCountsMap && window.eventCountsMap[ev.id]) || ev.current_attendees || 0}${ev.max_attendees ? ' / ' + ev.max_attendees : ''}</button></td>
-          <td>${ev.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}</td>
+          <td class="text-nowrap">${ev.date || 'TBD'}</td>
+          <td class="text-nowrap">${ev.requires_payment ? `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning">${formatCurrency(ev.payment_amount)}</span>` : '<span class="badge bg-success">Free</span>'}</td>
+          <td class="text-nowrap"><button class="btn btn-sm btn-outline-success py-0 px-2 text-nowrap" style="font-size:12px;font-weight:600;" onclick="viewEventAttendees('${ev.id}')" title="Click to view attending / paid students"><i class="bi bi-people me-1"></i>${(window.eventCountsMap && window.eventCountsMap[ev.id]) || ev.current_attendees || 0}${ev.max_attendees ? ' / ' + ev.max_attendees : ''}</button></td>
+          <td class="text-nowrap">${ev.is_active ? '<span class="badge bg-success" style="cursor:pointer;" onclick="toggleEventActiveStatus(\'' + ev.id + '\', false)" title="Click to set Inactive">Active</span>' : '<span class="badge bg-secondary" style="cursor:pointer;" onclick="toggleEventActiveStatus(\'' + ev.id + '\', true)" title="Click to set Active">Inactive</span>'}</td>
           <td class="small" style="min-width: 190px;">
             <div class="form-check form-switch mb-1">
               <input class="form-check-input" type="checkbox" role="switch" id="rep-${ev.id}" ${ev.allow_repeat_orders ? 'checked' : ''} ${ev.requires_payment ? '' : 'disabled title="Only for paid events"'} onchange="toggleEventOption('${ev.id}', 'allow_repeat_orders', this)">
@@ -3220,13 +3288,95 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
       }
     };
 
+    window.toggleEventActiveStatus = async function(eventId, makeActive) {
+      try {
+        await apiAdmin.update("events", eventId, { is_active: !!makeActive, updated_at: new Date().toISOString() });
+        await logAdminAction("UPDATE", "event", eventId, { is_active: !!makeActive });
+        Swal.fire({ toast: true, position: "top-end", icon: "success", timer: 1800, showConfirmButton: false, title: makeActive ? "Event set to Active" : "Event set to Inactive" });
+        await loadEvents();
+        loadDashboardStats();
+      } catch (err) {
+        Swal.fire("Error", "Could not update status: " + (err.message || err), "error");
+      }
+    };
+
     async function loadEvents() {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('date', { ascending: false });
-      
-      window.currentEventsList = data || []; const tbody = document.getElementById('events-table-body'); window.eventCountsMap = {}; try { let allP = []; if (Array.isArray(window.allPaymentsList) && window.allPaymentsList.length > 0) { allP = window.allPaymentsList; } else if (typeof api?.payments?.getAll === 'function') { const pr = await api.payments.getAll({ limit: 500 }); allP = pr?.data?.payments || []; window.allPaymentsList = allP; } (data || []).forEach(ev => { const evPays = allP.filter(p => p.event_id === ev.id && (p.status === 'verified' || !p.status)); /* seats are counted in tickets: current_attendees is synced server-side (free + paid); paid ticket sum is a fallback */ const paidTickets = evPays.reduce((sum, p) => sum + Math.max(1, parseInt(p.ticket_quantity, 10) || 1), 0); window.eventCountsMap[ev.id] = Math.max(Number(ev.current_attendees) || 0, paidTickets); }); } catch(cntErr){ console.warn('[loadEvents] count err:', cntErr); }
+      let data = null;
+      let error = null;
+      // 1. Primary: fetch via backend admin endpoint (service_role bypasses RLS so inactive events are included)
+      try {
+        const adminRes = await apiAdmin.list("events", { order: "date", ascending: "false" });
+        if (Array.isArray(adminRes)) data = adminRes;
+        else if (adminRes && Array.isArray(adminRes.data)) data = adminRes.data;
+      } catch (_) {}
+
+      // 2. Fallback: merge anon Supabase query + /api/events/past + known event IDs from payments (works even before backend redeploy)
+      let allP = [];
+      try {
+        if (Array.isArray(window.allPaymentsList) && window.allPaymentsList.length > 0) {
+          allP = window.allPaymentsList;
+        } else if (typeof api?.payments?.getAll === 'function') {
+          const pr = await api.payments.getAll({ limit: 500 });
+          allP = pr?.data?.payments || [];
+          window.allPaymentsList = allP;
+        }
+      } catch (_) {}
+
+      if (!Array.isArray(data)) {
+        const sbRes = await supabase.from("events").select("*").order("date", { ascending: false });
+        data = sbRes.data || [];
+        error = sbRes.error;
+        const byId = new Map(data.map(e => [e.id, e]));
+
+        // Merge past events from backend (includes inactive past events)
+        try {
+          const base = window.API_URL || (window.__CONFIG && window.__CONFIG.apiUrl) || "https://naco-tau-backend.vercel.app/api";
+          const pastResp = await fetch(`${base.replace(/\/$/, "")}/events/past?page=1&limit=100`);
+          if (pastResp.ok) {
+            const pastJson = await pastResp.json();
+            const pastEvents = pastJson?.data?.events || [];
+            pastEvents.forEach(e => { if (e && e.id && !byId.has(e.id)) byId.set(e.id, e); });
+          }
+        } catch (_) {}
+
+        // Also fetch any event IDs referenced by payments or local cache that RLS hid (e.g. inactive upcoming events)
+        try {
+          const knownIds = new Set(allP.map(p => p.event_id).filter(Boolean));
+          try {
+            const { data: audRows } = await supabase.from("audit_logs").select("entity_id, details").order("created_at", { ascending: false }).limit(60);
+            (audRows || []).forEach(a => {
+              if (a.entity_id && /^[0-9a-f-]{36}$/i.test(a.entity_id)) knownIds.add(a.entity_id);
+              if (a.details?.event_id && /^[0-9a-f-]{36}$/i.test(a.details.event_id)) knownIds.add(a.details.event_id);
+            });
+          } catch (_) {}
+          try {
+            const cachedIds = JSON.parse(localStorage.getItem("nacos_admin_known_event_ids") || "[]");
+            if (Array.isArray(cachedIds)) cachedIds.forEach(id => { if (id) knownIds.add(id); });
+          } catch (_) {}
+          const missingIds = [...knownIds].filter(id => !byId.has(id));
+          if (missingIds.length) {
+            const base = window.API_URL || (window.__CONFIG && window.__CONFIG.apiUrl) || "https://naco-tau-backend.vercel.app/api";
+            await Promise.allSettled(missingIds.map(async (id) => {
+              const r = await fetch(`${base.replace(/\/$/, "")}/events/${encodeURIComponent(id)}`);
+              if (r.ok) {
+                const j = await r.json();
+                if (j?.data?.id) byId.set(j.data.id, j.data);
+              }
+            }));
+          }
+        } catch (_) {}
+
+        data = [...byId.values()].sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+      }
+
+      try {
+        const allIds = (data || []).map(e => e.id).filter(Boolean);
+        const prevIds = JSON.parse(localStorage.getItem("nacos_admin_known_event_ids") || "[]");
+        const mergedIds = [...new Set([...(Array.isArray(prevIds) ? prevIds : []), ...allIds])].slice(-200);
+        localStorage.setItem("nacos_admin_known_event_ids", JSON.stringify(mergedIds));
+      } catch (_) {}
+
+      window.currentEventsList = data || []; const tbody = document.getElementById('events-table-body'); window.eventCountsMap = {}; try { (data || []).forEach(ev => { const evPays = allP.filter(p => p.event_id === ev.id && (p.status === 'verified' || !p.status)); const paidTickets = evPays.reduce((sum, p) => sum + Math.max(1, parseInt(p.ticket_quantity, 10) || 1), 0); window.eventCountsMap[ev.id] = Math.max(Number(ev.current_attendees) || 0, paidTickets); }); } catch(cntErr){ console.warn('[loadEvents] count err:', cntErr); }
       const colSpan = 7;
       
       if (isMissingTableError(error, 'events')) {
@@ -3234,7 +3384,7 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
         tbody.innerHTML = missingTableRowHtml('events', colSpan);
         return;
       }
-      if (error || !data || data.length === 0) {
+      if (!data || data.length === 0) {
         if (error) console.warn('[loadEvents] query error:', error);
         if (document.getElementById('eventResultsInfo')) document.getElementById('eventResultsInfo').textContent = error ? 'Error loading events' : 'No events yet'; tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center text-muted py-4">${error ? `Error loading events: ${escapeHtml(error.message || String(error))}` : 'No events yet'}</td></tr>`;
         return;
@@ -3243,12 +3393,202 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
       allEventsList = data || []; window.currentEventsList = allEventsList; filterAndDisplayEvents();
     }
 
+    window.__currentEventAttendees = [];
+    window.__currentFilteredAttendees = [];
+    window.__currentAttendeesEvent = null;
+
+    window.resetEventAttendeesFilters = function() {
+      const s = document.getElementById('attSearchInput'); if (s) s.value = '';
+      const t = document.getElementById('attTypeFilter'); if (t) t.value = '';
+      const g = document.getElementById('attGameFilter'); if (g) g.value = '';
+      const st = document.getElementById('attStatusFilter'); if (st) st.value = '';
+      window.filterAndRenderEventAttendees();
+    };
+
+    window.filterAndRenderEventAttendees = function() {
+      const tbody = document.getElementById('eventAttendeesTableBody');
+      if (!tbody) return;
+      const all = Array.isArray(window.__currentEventAttendees) ? window.__currentEventAttendees : [];
+      const q = (document.getElementById('attSearchInput')?.value || '').toLowerCase().trim();
+      const typeVal = (document.getElementById('attTypeFilter')?.value || '').toLowerCase().trim();
+      const gameVal = (document.getElementById('attGameFilter')?.value || '').trim();
+      const statusVal = (document.getElementById('attStatusFilter')?.value || '').toLowerCase().trim();
+      const clearBtn = document.getElementById('attSearchClearBtn');
+      if (clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+      const infoEl = document.getElementById('attFilterResultsInfo');
+
+      if (!all.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No students have registered or paid for this event yet.</td></tr>';
+        if (infoEl) infoEl.textContent = '';
+        window.__currentFilteredAttendees = [];
+        return;
+      }
+
+      const filtered = all.filter(item => {
+        if (typeVal === "student" && item.isGuest) return false;
+        if (typeVal === "guest" && !item.isGuest) return false;
+        if (statusVal && item.statusCategory !== statusVal) return false;
+        if (gameVal) {
+          const hasGame = (item.games || []).some(g => String(g.item_id) === gameVal || String(g.name) === gameVal);
+          if (!hasGame) return false;
+        }
+        if (q) {
+          const haystack = [
+            item.name,
+            item.email,
+            item.phone,
+            item.matricNo,
+            item.department,
+            item.reference,
+            item.ticketNumber,
+            item.gamesText,
+            item.usernamesText
+          ].join(' ').toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+        return true;
+      });
+
+      window.__currentFilteredAttendees = filtered;
+      const totalTickets = all.reduce((s, a) => s + a.tickets, 0);
+      const filteredTickets = filtered.reduce((s, a) => s + a.tickets, 0);
+      const filteredPaidSum = filtered.reduce((s, a) => s + (Number(a.amount) || 0), 0);
+
+      if (infoEl) {
+        if (filtered.length === all.length) {
+          infoEl.innerHTML = `Showing all <strong>${all.length}</strong> attendee(s) &middot; <strong>${totalTickets}</strong> ticket(s)` + (filteredPaidSum > 0 ? ` &middot; <strong>${formatCurrency(filteredPaidSum)}</strong>` : "");
+        } else {
+          infoEl.innerHTML = `Showing <strong>${filtered.length}</strong> of ${all.length} attendee(s) (filtered) &middot; <strong>${filteredTickets}</strong> ticket(s)` + (filteredPaidSum > 0 ? ` &middot; <strong>${formatCurrency(filteredPaidSum)}</strong>` : "");
+        }
+      }
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4"><i class="bi bi-search me-1"></i>No attendees match your search or filter.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => item.rowHtml).join('');
+    };
+
+    window.exportEventAttendeesPdf = function() {
+      const list = (Array.isArray(window.__currentFilteredAttendees) && window.__currentFilteredAttendees.length)
+        ? window.__currentFilteredAttendees
+        : (Array.isArray(window.__currentEventAttendees) ? window.__currentEventAttendees : []);
+      if (!list.length) {
+        Swal.fire('No Attendees', 'There are no attendee records to export.', 'info');
+        return;
+      }
+      const ev = window.__currentAttendeesEvent || {};
+      const evTitle = ev.title || 'Event Attendees';
+      const hasGames = list.some(a => (a.games && a.games.length) || a.gamesText || a.usernamesText);
+      const totalTickets = list.reduce((s, a) => s + a.tickets, 0);
+      const studentCount = list.filter(a => !a.isGuest).length;
+      const guestCount = list.filter(a => a.isGuest).length;
+      const totalPaid = list.reduce((s, a) => s + (Number(a.amount) || 0), 0);
+
+      const activeFilters = [];
+      const q = (document.getElementById('attSearchInput')?.value || '').trim();
+      const typeEl = document.getElementById('attTypeFilter');
+      const gameEl = document.getElementById('attGameFilter');
+      const statusEl = document.getElementById('attStatusFilter');
+      if (q) activeFilters.push(`Search: "${q}"`);
+      if (typeEl && typeEl.value) activeFilters.push(typeEl.options[typeEl.selectedIndex].text);
+      if (gameEl && gameEl.value) activeFilters.push(`Game: ${gameEl.options[gameEl.selectedIndex].text}`);
+      if (statusEl && statusEl.value) activeFilters.push(statusEl.options[statusEl.selectedIndex].text);
+
+      const jspdfNs = window.jspdf;
+      if (jspdfNs && typeof jspdfNs.jsPDF === "function") {
+        const doc = new jspdfNs.jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        // Header banner
+        doc.setFillColor(21, 122, 9);
+        doc.rect(0, 0, pageWidth, 62, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(15);
+        doc.text(`NACOS TAU — ${evTitle}`, 32, 26);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        const nairaPlain = (n) => "NGN " + Number(n || 0).toLocaleString("en-NG", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        const subLine = `Attendees: ${list.length} (${studentCount} Student${studentCount === 1 ? "" : "s"}, ${guestCount} Guest${guestCount === 1 ? "" : "s"})   |   Tickets / Plays: ${totalTickets}   |   Total Paid: ${nairaPlain(totalPaid)}   |   Exported: ${new Date().toLocaleString("en-NG")}`;
+        doc.text(subLine, 32, 44);
+        if (activeFilters.length) {
+          doc.setFontSize(9);
+          doc.text(`Active Filter: ${activeFilters.join(" · ")}`, 32, 56);
+        }
+
+        const head = hasGames
+          ? [["#", "Full Name", "Type", "Email Address", "Phone Number", "Matric No / Dept", "Game / Activity", "Username (IGN)", "Qty", "Fee / Status", "Date"]]
+          : [["#", "Full Name", "Type", "Email Address", "Phone Number", "Matric No", "Department", "Qty", "Fee / Status", "Ticket / Ref", "Date"]];
+
+        const body = list.map((a, idx) => {
+          const matricDept = a.isGuest
+            ? "Guest"
+            : [a.matricNo !== "N/A" ? a.matricNo : "", a.department !== "N/A" ? a.department : ""].filter(Boolean).join(" / ") || "N/A";
+          if (hasGames) {
+            return [
+              String(idx + 1),
+              a.name || "—",
+              a.typeLabel,
+              a.email || "—",
+              a.phone || "—",
+              matricDept,
+              a.gamesText || "Standard Ticket",
+              a.usernamesText || "—",
+              String(a.tickets),
+              a.statusPdfText,
+              a.dateStr
+            ];
+          }
+          return [
+            String(idx + 1),
+            a.name || "—",
+            a.typeLabel,
+            a.email || "—",
+            a.phone || "—",
+            a.isGuest ? "Guest" : (a.matricNo || "N/A"),
+            a.isGuest ? "Guest" : (a.department || "N/A"),
+            String(a.tickets),
+            a.statusPdfText,
+            a.ticketNumber || a.reference || "—",
+            a.dateStr
+          ];
+        });
+
+        doc.autoTable({
+          startY: 74,
+          head,
+          body,
+          theme: "grid",
+          styles: { fontSize: 8.5, cellPadding: 5, overflow: "linebreak", valign: "middle" },
+          headStyles: { fillColor: [21, 122, 9], textColor: 255, fontStyle: "bold" },
+          alternateRowStyles: { fillColor: [248, 250, 252] },
+          margin: { left: 24, right: 24, bottom: 28 }
+        });
+
+        const safeTitle = evTitle.replace(/[^a-zA-Z0-9_-]+/g, "_").replace(/^_|_$/g, "") || "Event";
+        const dateTag = new Date().toISOString().slice(0, 10);
+        doc.save(`NACOS_Attendees_${safeTitle}_${dateTag}.pdf`);
+        Swal.fire({ toast: true, position: "top-end", icon: "success", title: `Exported ${list.length} attendee(s) to PDF`, showConfirmButton: false, timer: 2200 });
+        return;
+      }
+
+      Swal.fire("PDF Library Unavailable", "Could not load the PDF generator. Please check your internet connection and refresh the page.", "error");
+    };
+
     window.viewEventAttendees = async function(eventId) {
       const targetEvent = (window.currentEventsList || []).find(e => e.id === eventId);
+      window.__currentAttendeesEvent = targetEvent || { id: eventId, title: 'Event' };
       const title = targetEvent ? targetEvent.title : 'Event';
       document.getElementById('eventAttendeesModalTitle').innerHTML = '<i class="bi bi-people-fill me-2 text-primary"></i>Attendees: ' + escapeHtml(title);
       const reserveBtn = document.getElementById('reserveSpotFromModalBtn');
       if (reserveBtn) reserveBtn.onclick = () => openReserveSpotModal(eventId);
+      const sInput = document.getElementById('attSearchInput'); if (sInput) sInput.value = '';
+      const tInput = document.getElementById('attTypeFilter'); if (tInput) tInput.value = '';
+      const gInput = document.getElementById('attGameFilter'); if (gInput) gInput.innerHTML = '<option value="">All Games / Activities</option>';
+      const stInput = document.getElementById('attStatusFilter'); if (stInput) stInput.value = '';
+      const infoEl = document.getElementById('attFilterResultsInfo'); if (infoEl) infoEl.textContent = '';
       const tbody = document.getElementById('eventAttendeesTableBody');
       tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Loading attendees...</td></tr>';
       const modalEl = document.getElementById('eventAttendeesModal');
@@ -3277,8 +3617,6 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
           (gi?.data || []).forEach(g => { window.__attGameNames[g.id] = g.name; });
         } catch (_) {}
 
-        // Registrations come from the admin API: the browser itself may only
-        // read its own rows, which hid every free sign-up.
         let nonPaidRegs = [];
         try {
           const rr = await eventsApiRequest('GET', `/${encodeURIComponent(eventId)}/registrations`);
@@ -3293,41 +3631,71 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
         nonPaidRegs = nonPaidRegs.filter(r => (r.status || 'registered') !== 'cancelled');
 
         if (!evPays.length && !nonPaidRegs.length) {
+          window.__currentEventAttendees = [];
+          window.__currentFilteredAttendees = [];
           tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No students have registered or paid for this event yet.</td></tr>';
           document.getElementById('eventAttendeesModalSubtitle').textContent = '0 students registered / paid';
           return;
         }
 
-        // Seats are counted in tickets (one order can hold several tickets).
         const qtyOf = (row) => Math.max(1, parseInt(row && row.ticket_quantity, 10) || 1);
         const otherRegs = nonPaidRegs.filter(r => !r.linked_payment_id || !evPays.some(p => p.id === r.linked_payment_id));
         const totalCount = evPays.length + otherRegs.length;
         const totalTickets = evPays.reduce((sum, p) => sum + qtyOf(p), 0) + otherRegs.reduce((sum, r) => sum + qtyOf(r), 0);
         document.getElementById('eventAttendeesModalSubtitle').textContent = totalCount + ' student(s) registered / paid · ' + totalTickets + ' ticket(s)';
 
-        let rowsHtml = '';
+        const gameFilterMap = new Map();
+        const attendees = [];
+
         evPays.forEach(p => {
-          const st = p.students || {};
-          const isGuestRow = !p.user_id && !!p.guest_email;
-          const sName = st.name || (isGuestRow ? (p.guest_name || 'Guest') : 'Student');
+          const linkedReg = nonPaidRegs.find(r => r.linked_payment_id === p.id) || {};
+          const st = p.students || linkedReg.students || {};
+          const isGuestRow = !p.user_id && !!(p.guest_email || linkedReg.guest_email);
+          const sName = st.name || `${st.first_name || ''} ${st.last_name || ''}`.trim() || (isGuestRow ? (p.guest_name || linkedReg.guest_name || 'Guest') : 'Student');
+          const matricPlain = st.matric_no || 'N/A';
+          const deptPlain = st.department || 'N/A';
           const mNo = st.matric_no ? ('<code>' + escapeHtml(st.matric_no) + '</code>') : '<span class="text-muted">N/A</span>';
           const dpt = st.department ? escapeHtml(st.department) : '<span class="text-muted">N/A</span>';
-          const emlVal = st.email || (isGuestRow ? p.guest_email : '');
-          const phoneVal = p.buyer_phone || (isGuestRow ? p.guest_phone : '') || st.phone || '';
-          const gameLines = Array.isArray(p.order_items) && p.order_items.length
-            ? p.order_items.map(l => ({ item_id: l.item_id, name: l.name, plays: l.plays }))
-            : (p.event_item_id ? [{ item_id: p.event_item_id, name: null, plays: qtyOf(p) }] : []);
-          const entries = Array.isArray(p.entry_details) ? p.entry_details : [];
-          const gamesHtml = gameLines.length ? '<br><small>' + gameLines.map(l => {
+          const emlVal = st.email || (isGuestRow ? (p.guest_email || linkedReg.guest_email) : '') || '';
+          const phoneVal = p.buyer_phone || (isGuestRow ? (p.guest_phone || linkedReg.guest_phone) : '') || st.phone || '';
+          const rawLines = (Array.isArray(p.order_items) && p.order_items.length)
+            ? p.order_items
+            : (Array.isArray(linkedReg.order_items) && linkedReg.order_items.length)
+              ? linkedReg.order_items
+              : (p.event_item_id || linkedReg.event_item_id)
+                ? [{ item_id: p.event_item_id || linkedReg.event_item_id, name: null, plays: qtyOf(p) }]
+                : [];
+          const entries = (Array.isArray(p.entry_details) && p.entry_details.length)
+            ? p.entry_details
+            : (Array.isArray(linkedReg.entry_details) ? linkedReg.entry_details : []);
+
+          const parsedGames = rawLines.map(l => {
             const e = entries.find(x => x && x.item_id === l.item_id);
             const nm = l.name || (e && e.name) || (window.__attGameNames && window.__attGameNames[l.item_id]) || 'Game';
-            return '🎮 ' + escapeHtml(nm) + (l.plays > 1 ? ' × ' + l.plays : '') + (e ? ' <span class="badge bg-light text-dark border" title="Player username">' + escapeHtml(e.username) + '</span>' : '');
+            const uname = e && e.username ? String(e.username).trim() : '';
+            const gId = String(l.item_id || nm);
+            gameFilterMap.set(gId, nm);
+            return { item_id: gId, name: nm, plays: Number(l.plays) || 1, username: uname };
+          });
+
+          const gamesHtml = parsedGames.length ? '<br><small>' + parsedGames.map(g => {
+            return '🎮 ' + escapeHtml(g.name) + (g.plays > 1 ? ' × ' + g.plays : '') + (g.username ? ' <span class="badge bg-light text-dark border" title="Player username">' + escapeHtml(g.username) + '</span>' : '');
           }).join('<br>') + '</small>' : '';
+
+          const gamesText = parsedGames.map(g => g.name + (g.plays > 1 ? ` × ${g.plays}` : "")).join(", ");
+          const usernamesText = parsedGames.filter(g => g.username).map(g => parsedGames.length > 1 ? `${g.name}: ${g.username}` : g.username).join(", ");
+
           const eml = (emlVal || phoneVal ? ('<br><small class="text-muted">' + escapeHtml(emlVal) + (phoneVal ? (emlVal ? ' · ' : '') + '<i class="bi bi-telephone"></i> ' + escapeHtml(phoneVal) : '') + '</small>') : '') +
             (isGuestRow ? ' <span class="badge bg-warning-subtle text-warning-emphasis border border-warning">Guest</span>' : '') + gamesHtml;
           const pQty = qtyOf(p);
-          const isManualRef = String(p.transaction_id || '').startsWith('RSV-');
+          const isManualRef = String(p.transaction_id || '').startsWith('RSV-') || /Manual Reservation|Reserved Spot|Complimentary reservation|Manual offline ticket/i.test(String(p.notes || '') + ' ' + String(p.description || ''));
           const isComp = isManualRef && Number(p.amount) === 0;
+          const statusCategory = isComp ? "complimentary" : isManualRef ? "offline_paid" : "online_paid";
+          const statusPdfText = isComp
+            ? "Reserved (NGN 0)"
+            : isManualRef
+              ? `Paid NGN ${Number(p.amount || 0).toLocaleString("en-NG")} (Offline)`
+              : `Paid NGN ${Number(p.amount || 0).toLocaleString("en-NG")}`;
           const statusBadge = isComp
             ? '<span class="badge bg-primary"><i class="bi bi-bookmark-star me-1"></i>Reserved (Complimentary)</span>'
             : isManualRef
@@ -3340,21 +3708,44 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
             ' <span class="badge bg-light text-dark border">' + pQty + ' ticket' + (pQty > 1 ? 's' : '') + '</span>' + receiptLink;
           const rDate = p.verified_at || p.submitted_at || p.created_at || null;
           const dStr = rDate ? new Date(rDate).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+          const ticketNum = linkedReg.ticket_number || ('NACOS-' + String(eventId).substring(0, 4).toUpperCase() + '-' + String(p.id || '').substring(0, 6).toUpperCase());
 
-          rowsHtml += '<tr>' +
+          const rowHtml = '<tr>' +
             '<td><strong>' + escapeHtml(sName) + '</strong>' + eml + '</td>' +
             '<td>' + mNo + '</td>' +
             '<td>' + dpt + '</td>' +
             '<td>' + pBadge + '</td>' +
             '<td><small class="text-muted">' + dStr + '</small></td>' +
           '</tr>';
+
+          attendees.push({
+            name: sName,
+            isGuest: isGuestRow,
+            typeLabel: isGuestRow ? "Guest" : "Student",
+            email: emlVal,
+            phone: phoneVal,
+            matricNo: matricPlain,
+            department: deptPlain,
+            games: parsedGames,
+            gamesText,
+            usernamesText,
+            tickets: pQty,
+            amount: Number(p.amount) || 0,
+            statusCategory,
+            statusPdfText,
+            ticketNumber: ticketNum,
+            reference: p.transaction_id || "",
+            dateStr: dStr,
+            rowHtml
+          });
         });
 
-        // Free sign-ups (and any registration without a matching paid order)
         otherRegs.forEach(r => {
           const st = r.students || {};
           const isGuestRow = !r.user_id && !!r.guest_email;
-          const sName = st.name || (isGuestRow ? (r.guest_name || 'Guest') : 'Student');
+          const sName = st.name || `${st.first_name || ''} ${st.last_name || ''}`.trim() || (isGuestRow ? (r.guest_name || 'Guest') : 'Student');
+          const matricPlain = st.matric_no || 'N/A';
+          const deptPlain = st.department || 'N/A';
           const mNo = st.matric_no ? ('<code>' + escapeHtml(st.matric_no) + '</code>') : '<span class="text-muted">N/A</span>';
           const dpt = st.department ? escapeHtml(st.department) : '<span class="text-muted">N/A</span>';
           const emlVal = st.email || r.guest_email || '';
@@ -3366,16 +3757,47 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
             : '<span class="badge bg-secondary"><i class="bi bi-person-check me-1"></i>Registered (free)</span>';
           const rDate = r.registration_date || r.created_at || null;
           const dStr = rDate ? new Date(rDate).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
-          rowsHtml += '<tr>' +
+          const rowHtml = '<tr>' +
             '<td><strong>' + escapeHtml(sName) + '</strong>' + eml + '</td>' +
             '<td>' + mNo + '</td>' +
             '<td>' + dpt + '</td>' +
             '<td>' + badge + ' <span class="badge bg-light text-dark border">' + q + ' ticket' + (q > 1 ? 's' : '') + '</span></td>' +
             '<td><small class="text-muted">' + dStr + '</small></td>' +
           '</tr>';
+
+          attendees.push({
+            name: sName,
+            isGuest: isGuestRow,
+            typeLabel: isGuestRow ? "Guest" : "Student",
+            email: emlVal,
+            phone: phoneVal,
+            matricNo: matricPlain,
+            department: deptPlain,
+            games: [],
+            gamesText: "",
+            usernamesText: "",
+            tickets: q,
+            amount: 0,
+            statusCategory: r.linked_payment_id ? "unverified" : "free",
+            statusPdfText: r.linked_payment_id ? "Unverified" : "Registered (Free)",
+            ticketNumber: r.ticket_number || "",
+            reference: "",
+            dateStr: dStr,
+            rowHtml
+          });
         });
 
-        tbody.innerHTML = rowsHtml;
+        // Populate game dropdown options if event has games
+        Object.entries(window.__attGameNames || {}).forEach(([id, nm]) => {
+          if (!gameFilterMap.has(String(id))) gameFilterMap.set(String(id), nm);
+        });
+        if (gInput) {
+          const gameOpts = [...gameFilterMap.entries()].map(([id, nm]) => `<option value="${escapeHtml(id)}">${escapeHtml(nm)}</option>`).join("");
+          gInput.innerHTML = `<option value="">All Games / Activities</option>${gameOpts}`;
+        }
+
+        window.__currentEventAttendees = attendees;
+        window.filterAndRenderEventAttendees();
       } catch (err) {
         console.error('[viewEventAttendees]', err);
         tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Error loading attendees: ' + escapeHtml(err.message || String(err)) + '</td></tr>';
@@ -3633,13 +4055,26 @@ ALTER TABLE public.past_executives ENABLE ROW LEVEL SECURITY;`
     // Edit Event - Load data into modal
 window.editEvent = async function(eventId) {
     try {
-        const { data: event, error } = await supabase
-            .from('events')
-            .select('*')
-            .eq('id', eventId)
-            .single();
-        
-        if (error) throw error;
+        let event = (window.currentEventsList || []).find(e => e.id === eventId) || null;
+        if (!event) {
+            try {
+                const base = window.API_URL || (window.__CONFIG && window.__CONFIG.apiUrl) || "https://naco-tau-backend.vercel.app/api";
+                const resp = await fetch(`${base.replace(/\/$/, "")}/events/${encodeURIComponent(eventId)}`);
+                if (resp.ok) {
+                    const json = await resp.json();
+                    event = json?.data || null;
+                }
+            } catch (_) {}
+        }
+        if (!event) {
+            const { data: sbEvent, error } = await supabase
+                .from('events')
+                .select('*')
+                .eq('id', eventId)
+                .single();
+            if (error) throw error;
+            event = sbEvent;
+        }
         
         // Populate modal fields
         document.getElementById('edit-event-id').value = event.id;
