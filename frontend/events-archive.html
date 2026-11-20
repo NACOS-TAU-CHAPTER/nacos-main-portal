@@ -538,6 +538,8 @@
     let searchDebounceTimer = null;
     let winnersByEvent = {};
 
+    const API_BASE_URL = (window.__CONFIG?.apiUrl || window.API_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:5000/api' : 'https://naco-tau-backend.vercel.app/api')).replace(/\/api\/?$/, '');
+
     async function loadRecentEventWinners() {
       try {
         const resp = await fetch(`${API_BASE_URL}/api/events/winners/recent`);
